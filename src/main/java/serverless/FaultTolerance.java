@@ -84,7 +84,8 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                     String errorMessage = errorObject.get("errorMessage").getAsString();
                     String errorType = errorObject.get("errorType").getAsString();
                     String simpleErrorMessage = "Error Message: " + errorMessage + ", Error Type: " + errorType;
-                    logError(functionName, new Exception(simpleErrorMessage));
+                    System.err.println("" + errorObject);
+//                    logError(functionName, new Exception(simpleErrorMessage));
                     if (errorMessage.contains("Task timed out")) {
                         metricsHandler.incrementCallsTimedOut();
                     }else {

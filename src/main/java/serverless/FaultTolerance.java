@@ -59,19 +59,28 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                 String responseJson = invokeResponse.payload().asUtf8String();
                 System.out.println("" + invokeResponse.functionError());
 
+                // Check if the Lambda function has thrown an error
+                if (invokeResponse.functionError() != null) {
+                    logError(functionName, new Exception(responseJson));
+                    if (attempt < retries) {
+                        Thread.sleep(1000);
+                    }
+                    continue;
+                }
+
                 // Parse the response JSON into a Map
                 Map<String, Object> responseMap = new Gson().fromJson(responseJson, Map.class);
 
-                // Check if the responseMap contains an error key
-                if (responseMap.containsKey("error")) {
-                    logError(functionName, new Exception("Lambda returned an error: " + responseMap.get("error")));
-                    continue;
-                }
                 return responseMap;
-
             } catch (Exception e) {
                 logError(functionName, e);
-                if (attempt == retries) {
+                if (attempt < retries) {
+                    try {
+                        Thread.sleep(1000);  // Introducing a delay of 1 second after catching an exception and before the next retry
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt(); // Restore the interrupted status
+                    }
+                } else {
                     return fallbackResponse(functionName);
                 }
             }

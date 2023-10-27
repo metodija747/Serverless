@@ -24,22 +24,26 @@ import java.util.Map;
 public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     LambdaClient lambdaClient = LambdaClient.builder().build();
-    MetricsHandler metricsHandler = new MetricsHandler();
     DynamoDbClient dynamoDB = DynamoDbClient.builder().build();
     private static final String DYNAMODB_TABLE = "ErrorTracker";
     private static final Map<String, FunctionInfo> functionMap = new HashMap<>();
-
     static {
         functionMap.put("GET:/dispatcher/catalog", new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetAndSearchProductsFunctioni-Fia94NeRCooH", 3));
         // ... add    other mappings
     }
-
+    private static final Map<String, String> FUNCTION_NAME_MAPPING = new HashMap<>();
+    static {
+        FUNCTION_NAME_MAPPING.put("GET:/dispatcher/catalog", "GetAndSearchProductsFunctioni");
+        // ... add other mappings
+    }
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
+        MetricsHandler metricsHandler = new MetricsHandler();
         String httpMethod = (String) event.get("httpMethod");
         String path = (String) event.get("path");
         String key = httpMethod + ":" + path;
-
+        String lambdaFunctionName = FUNCTION_NAME_MAPPING.get(key);
+        metricsHandler.setLambdaFunctionName(lambdaFunctionName);
         FunctionInfo functionInfo = functionMap.get(key);
         if (functionInfo == null) {
             return ResponseGenerator.generateResponse(400, "Invalid path or method");
@@ -50,12 +54,14 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
 
         if (isCircuitOpen(functionName)) {
             metricsHandler.incrementCallsPrevented();
+            metricsHandler.incrementFallbackCalls();
             return fallbackResponse(functionName);
         }
 
         for (int attempt = 1; attempt <= retries; attempt++) {
             if (isCircuitOpen(functionName)) {
                 metricsHandler.incrementCallsPrevented();
+                metricsHandler.incrementFallbackCalls();
                 return fallbackResponse(functionName);
             }
 
@@ -110,10 +116,12 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                     }
                 } else {
                     metricsHandler.incrementFailedCalls();
+                    metricsHandler.incrementFallbackCalls();
                     return fallbackResponse(functionName);
                 }
             }
         }
+        metricsHandler.incrementFallbackCalls();
         return fallbackResponse(functionName);  // retries exhausted or circuit is open, return fallback response
     }
 
@@ -154,7 +162,6 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
         }
 
     private Map<String, Object> fallbackResponse(String functionName) {
-        metricsHandler.incrementFallbackCalls();
         return ResponseGenerator.generateResponse(500, "Fallback response: Service:" + functionName +  " is temporarily unavailable");
     }
 

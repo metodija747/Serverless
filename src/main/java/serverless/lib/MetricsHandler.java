@@ -9,6 +9,7 @@ public class MetricsHandler {
 
     private final CloudWatchClient cloudWatch;
     private final String namespace;
+    private String lambdaFunctionName;
 
     public MetricsHandler() {
         this.cloudWatch = CloudWatchClient.builder()
@@ -16,7 +17,9 @@ public class MetricsHandler {
                 .build();
         this.namespace = "FaultTolerance";
     }
-
+    public void setLambdaFunctionName(String lambdaFunctionName) {
+        this.lambdaFunctionName = lambdaFunctionName;
+    }
 //    circuit is closed and the call is successful
     public void incrementCallsSucceeded() {
         publishMetric("circuitBreaker.callsSucceeded.total", 1, StandardUnit.COUNT);
@@ -56,7 +59,6 @@ public class MetricsHandler {
     }
 
     private void publishMetric(String metricName, double value, StandardUnit unit) {
-        String lambdaFunctionName = System.getenv("LAMBDA_FUNCTION_NAME");
         System.out.println("Lambda Function Name: " + lambdaFunctionName);
 
         PutMetricDataRequest request = PutMetricDataRequest.builder()

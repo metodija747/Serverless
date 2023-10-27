@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import serverless.lib.MetricsHandler;
 import serverless.lib.ResponseGenerator;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     LambdaClient lambdaClient = LambdaClient.builder().build();
+    MetricsHandler metricsHandler = new MetricsHandler();
     DynamoDbClient dynamoDB = DynamoDbClient.builder().build();
     private static final String DYNAMODB_TABLE = "ErrorTracker";
     private static final Map<String, FunctionInfo> functionMap = new HashMap<>();
@@ -47,11 +49,13 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
         int retries = functionInfo.getRetries();
 
         if (isCircuitOpen(functionName)) {
+            metricsHandler.incrementCallsPrevented();
             return fallbackResponse(functionName);
         }
 
         for (int attempt = 1; attempt <= retries; attempt++) {
             if (isCircuitOpen(functionName)) {
+                metricsHandler.incrementCallsPrevented();
                 return fallbackResponse(functionName);
             }
 
@@ -63,24 +67,35 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
 
                 InvokeResponse invokeResponse = lambdaClient.invoke(invokeRequest);
                 String responseJson = invokeResponse.payload().asUtf8String();
-                System.out.println("" + invokeResponse.functionError());
 
                 // Check if the Lambda function has thrown an error
                 if (invokeResponse.functionError() != null) {
+                    metricsHandler.incrementCallsFailed();
                     JsonParser parser = new JsonParser();
                     JsonObject errorObject = parser.parse(responseJson).getAsJsonObject();
-
-                    String simpleErrorMessage = "Error Message: " + errorObject.get("errorMessage").getAsString() +
-                            ", Error Type: " + errorObject.get("errorType").getAsString();
+                    String errorMessage = errorObject.get("errorMessage").getAsString();
+                    String errorType = errorObject.get("errorType").getAsString();
+                    String simpleErrorMessage = "Error Message: " + errorMessage + ", Error Type: " + errorType;
                     logError(functionName, new Exception(simpleErrorMessage));
-                    System.out.println("" + simpleErrorMessage);
+                    if (errorMessage.contains("Task timed out")) {
+                        metricsHandler.incrementCallsTimedOut();
+                    }else {
+                        metricsHandler.incrementCallsNotTimedOut();
+                    }
 
                     if (attempt < retries) {
+                        metricsHandler.incrementFailedCalls();
                         Thread.sleep(1000);
                     }
                     continue;
                 }
-
+                metricsHandler.incrementCallsSucceeded();
+                metricsHandler.incrementCallsNotTimedOut();
+                if (attempt == 1) {
+                    metricsHandler.incrementSuccessfulCallsWithoutRetries();
+                } else {
+                    metricsHandler.incrementSuccessfulCallsWithRetries();
+                }
                 // Parse the response JSON into a Map
                 Map<String, Object> responseMap = new Gson().fromJson(responseJson, Map.class);
 
@@ -94,11 +109,11 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                         Thread.currentThread().interrupt(); // Restore the interrupted status
                     }
                 } else {
+                    metricsHandler.incrementFailedCalls();
                     return fallbackResponse(functionName);
                 }
             }
         }
-
         return fallbackResponse(functionName);  // retries exhausted or circuit is open, return fallback response
     }
 
@@ -139,6 +154,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
         }
 
     private Map<String, Object> fallbackResponse(String functionName) {
+        metricsHandler.incrementFallbackCalls();
         return ResponseGenerator.generateResponse(500, "Fallback response: Service:" + functionName +  " is temporarily unavailable");
     }
 

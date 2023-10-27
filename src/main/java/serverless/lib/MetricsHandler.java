@@ -56,7 +56,7 @@ public class MetricsHandler {
     }
 
     private void publishMetric(String metricName, double value, StandardUnit unit) {
-        String lambdaFunctionName = System.getenv("AWS_LAMBDA_FUNCTION_NAME");
+        String lambdaFunctionName = System.getenv("LAMBDA_FUNCTION_NAME");
         System.out.println("Lambda Function Name: " + lambdaFunctionName);
 
         PutMetricDataRequest request = PutMetricDataRequest.builder()

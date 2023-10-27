@@ -54,7 +54,7 @@ Resources:
       Environment:
         Variables:
           JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
-          AWS_LAMBDA_FUNCTION_NAME: GetAndSearchProductsFunctioni
+          LAMBDA_FUNCTION_NAME: GetAndSearchProductsFunctioni
       Layers:
         - !Ref SharedLibrariesLayer
 

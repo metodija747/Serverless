@@ -40,6 +40,10 @@ Resources:
           Statement:
             - Effect: Allow
               Action:
+                - lambda:InvokeFunction
+              Resource: "*"
+            - Effect: Allow
+              Action:
                 - ssm:GetParameter
               Resource: "*"
             - Effect: Allow

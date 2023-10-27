@@ -84,7 +84,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                     String errorMessage = errorObject.get("errorMessage").getAsString();
                     String errorType = errorObject.get("errorType").getAsString();
                     String simpleErrorMessage = "Error Message: " + errorMessage + ", Error Type: " + errorType;
-                    System.err.println("" + errorObject);
+                    System.err.println("" + errorObject + "TRALALAL");
 //                    logError(functionName, new Exception(simpleErrorMessage));
                     if (errorMessage.contains("Task timed out")) {
                         metricsHandler.incrementCallsTimedOut();
@@ -110,7 +110,9 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
 
                 return responseMap;
             } catch (Exception e) {
-                logError(functionName, e);
+                System.err.println("" + e.getMessage());
+
+//                logError(functionName, e);
                 if (attempt < retries) {
                     try {
                         Thread.sleep(1000);  // Introducing a delay of 1 second after catching an exception and before the next retry

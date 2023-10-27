@@ -73,6 +73,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
 
                 InvokeResponse invokeResponse = lambdaClient.invoke(invokeRequest);
                 String responseJson = invokeResponse.payload().asUtf8String();
+                System.err.println("" + responseJson + " TRALALAL");
 
                 // Check if the Lambda function has thrown an error
                 if (invokeResponse.functionError() != null) {

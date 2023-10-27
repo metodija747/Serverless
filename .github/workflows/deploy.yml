@@ -1,0 +1,81 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install aws-sam-cli
+#      - name: Install SwaggerHub CLI
+#        run: npm install -g swaggerhub-cli
+#      - name: Upload to SwaggerHub
+#        env:
+#          SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
+#        run: |
+#          swaggerhub api:update Metodija7474/Serverless/1.0.0 --file ServerlessFunction/src/main/java/swagger.yaml
+
+#      # Add th e testing steps before the Build and Deploy step
+#      - name: Identify changed files
+#        run: |
+#          git diff --name-only HEAD^ HEAD > ${{ github.workspace }}/changed_files.txt
+#
+#      - name: Compile   and run MapChangedLambdas
+#        run: |
+#          cd ServerlessFunction/src/main/java
+#          javac MapChangedLambdas.java
+#          AFFECTED_LAMBDAS=$(java -cp . MapChangedLambdas | tail -n 1) # Get only the last line
+#          echo "$AFFECTED_LAMBDAS" > ${{ github.workspace }}/affected_lambdas.txt
+#          echo "Affected Lambdas: $AFFECTED_LAMBDAS"
+#
+#      - name: Run Integration Tests for Affected Lambda Functions
+#        env:
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#        run: |
+#          cd ServerlessFunction # Navigate to the directory containing the pom.xml file
+#          AFFECTED_LAMBDAS=$(cat ${{ github.workspace }}/affected_lambdas.txt)
+#          IFS=',' read -ra LAMBDAS <<< "$AFFECTED_LAMBDAS"
+#          LAST_INDEX=$((${#LAMBDAS[@]} - 1))
+#          for index in "${!LAMBDAS[@]}"; do
+#            lambda="${LAMBDAS[$index]}"
+#
+#            # Skip the lambdas that don't have tests
+#            if [ "$lambda" == "ConfirmForgotPassword" ] || [ "$lambda" == "ForgotPassword" ]; then
+#              echo "Skipping tests for $lambda as they don't exist"
+#              continue
+#            fi
+#
+#            test_class="serverless.IntegrationTests.${lambda}IntegrationTest" # Updated test class name
+#            echo "Running integration tests for $lambda: $test_class"
+#            mvn test -Dtest="$test_class"
+#            if [ $index -lt $LAST_INDEX ]; then
+#              echo "Waiting for 10 seconds before running the next test..."
+#              sleep 10
+#            fi
+#          done
+
+      - name: Build and Deploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          MAVEN_OPTS="-DskipTests=true" sam build
+          sam deploy --no-confirm-changeset

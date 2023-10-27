@@ -1,0 +1,10 @@
+{
+  "CLIENT_APP_ID": "16fec44qrgoth26a20ob5ft0tb",
+  "DYNAMO_REGION": "us-east-1",
+  "USER_POOL_ID": "us-east-1_cl8iVMzUb",
+  "ISSUER": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_cl8iVMzUw",
+  "CART_TABLE": "CartDB",
+  "ORDERS_TABLE": "OrdersDB",
+  "PRODUCT_TABLEI": "ProductCatalog",
+  "COMMENT_TABLE": "CommentDB"
+}

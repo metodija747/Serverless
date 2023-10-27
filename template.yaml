@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  LesaLjubljanaServerless
+
+  Sample SAM Template for LesaLjubljanaServerless
+
+Globals:
+  Function:
+    Timeout: 20
+    MemorySize: 128
+  Api:
+    Cors:
+      AllowOrigin: "'*'"
+      AllowHeaders: "'*'"
+      AllowMethods: "'*'"
+
+Resources:
+  SharedLibrariesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: SharedLibrariesLayer
+      Description: Layer for shared libraries
+      ContentUri: src/main/java/serverless/lib/
+      CompatibleRuntimes:
+        - java11
+      RetentionPolicy: Retain
+
+  GetAndSearchProductsFunctioni:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.CatalogProduct.GetAndSearchProducts::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Tracing: Active
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource:
+                - arn:aws:ssm:us-east-1:824949725598:parameter/USER_POOL_ID
+                - arn:aws:ssm:us-east-1:824949725598:parameter/CLIENT_APP_ID
+                - arn:aws:ssm:us-east-1:824949725598:parameter/DYNAMO_REGION
+                - arn:aws:ssm:us-east-1:824949725598:parameter/PRODUCT_TABLEI
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+      Layers:
+        - !Ref SharedLibrariesLayer
+
+  CircuitBreakerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.FaultTolerance::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonDynamoDBFullAccess
+        - Statement:
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource: "*"
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+      Events:
+        Dispatcher:
+          Type: Api
+          Properties:
+            Path: /dispatcher/{proxy+}
+            Method: ANY

@@ -73,7 +73,6 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
 
                 InvokeResponse invokeResponse = lambdaClient.invoke(invokeRequest);
                 String responseJson = invokeResponse.payload().asUtf8String();
-                System.err.println("" + responseJson + " TRALALAL");
 
                 // Check if the Lambda function has thrown an error
                 if (invokeResponse.functionError() != null) {
@@ -83,10 +82,8 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                     JsonParser parser = new JsonParser();
                     JsonObject errorObject = parser.parse(responseJson).getAsJsonObject();
                     String errorMessage = errorObject.get("errorMessage").getAsString();
-                    String errorType = errorObject.get("errorType").getAsString();
-                    String simpleErrorMessage = "Error Message: " + errorMessage + ", Error Type: " + errorType;
-                    System.err.println("" + errorObject + "TRALALAL");
-//                    logError(functionName, new Exception(simpleErrorMessage));
+                    String simpleErrorMessage = "Error Message: " + errorMessage;
+                    logError(functionName, new Exception(simpleErrorMessage));
                     if (errorMessage.contains("Task timed out")) {
                         metricsHandler.incrementCallsTimedOut();
                     }else {
@@ -111,9 +108,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
 
                 return responseMap;
             } catch (Exception e) {
-                System.err.println("" + e.getMessage());
-
-//                logError(functionName, e);
+                logError(functionName, e);
                 if (attempt < retries) {
                     try {
                         Thread.sleep(1000);  // Introducing a delay of 1 second after catching an exception and before the next retry

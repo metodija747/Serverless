@@ -146,7 +146,11 @@ public class GetAndSearchProducts implements RequestHandler<Map<String, Object>,
 
         } catch (Exception e) {
             Logger.getLogger(GetAndSearchProducts.class.getName()).log(Level.SEVERE, "Failed to obtain product list", e);
-            throw new RuntimeException("Failed to obtain product list", e);
+            // Create a map with exception details and return it
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return errorResponse;
+            //            throw new RuntimeException("Failed to obtain product list", e);
         }
     }
 }

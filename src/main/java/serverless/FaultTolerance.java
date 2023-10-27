@@ -59,16 +59,17 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                 String responseJson = invokeResponse.payload().asUtf8String();
                 System.out.println("" + invokeResponse.functionError());
 
-                // Check if the Lambda function has thrown an error
-                if (invokeResponse.functionError() != null) {
-                    logError(functionName, new Exception(responseJson));
-                    return null;  // Or return an appropriate error response
-                }
-
                 // Parse the response JSON into a Map
                 Map<String, Object> responseMap = new Gson().fromJson(responseJson, Map.class);
 
+                // Check if the responseMap contains an error key
+                if (responseMap.containsKey("error")) {
+                    logError(functionName, new Exception("Lambda returned an error: " + responseMap.get("error")));
+                    return null;  // Or return an appropriate error response
+                }
+
                 return responseMap;
+
             } catch (Exception e) {
                 logError(functionName, e);
             }

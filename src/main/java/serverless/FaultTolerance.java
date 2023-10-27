@@ -3,6 +3,8 @@ package serverless;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import serverless.lib.ResponseGenerator;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -65,6 +67,13 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
 
                 // Check if the Lambda function has thrown an error
                 if (invokeResponse.functionError() != null) {
+                    JsonParser parser = new JsonParser();
+                    JsonObject errorObject = parser.parse(responseJson).getAsJsonObject();
+
+                    String simpleErrorMessage = "Error Message: " + errorObject.get("errorMessage").getAsString() +
+                            ", Error Type: " + errorObject.get("errorType").getAsString();
+                    logError(functionName, new Exception(simpleErrorMessage));
+
                     logError(functionName, new Exception(responseJson));
                     if (attempt < retries) {
                         Thread.sleep(1000);
@@ -107,7 +116,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
         QueryResponse queryResponse = dynamoDB.query(queryRequest);
         System.out.println("" + queryResponse.count());
 
-        return queryResponse.count() >= 10;  // Assume circuit is open if 10 or more errors are found
+        return queryResponse.count() >= 4;  // Assume circuit is open if 10 or more errors are found
     }
 
     private void logError(String serviceName, Exception e) {

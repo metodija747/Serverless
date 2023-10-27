@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// ova test raboti
+// ova test    raboti
 public class GetAndSearchProducts implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     private static final Gson gson = new Gson();
@@ -41,6 +41,7 @@ public class GetAndSearchProducts implements RequestHandler<Map<String, Object>,
             if (event.containsKey("queryStringParameters") && event.get("queryStringParameters") != null) {
                 queryStringParameters = (Map<String, Object>) event.get("queryStringParameters");
             }
+            Logger.getLogger(GetAndSearchProducts.class.getName()).info("" + REGION + " " + PRODUCT_TABLE);
 
             // Ext ract the search term, sorting option, and category from the query string parameters
             // If no value is provided, default to an empty string or null

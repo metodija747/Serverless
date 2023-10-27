@@ -72,8 +72,10 @@ public class ConfigManager {
                     .build();
 
             GetParameterResponse response = ssmClient.getParameter(request);
+            System.out.println("Fetched value for " + parameterName + ": " + response.parameter().value());
             return response.parameter().value();
         } catch (Exception e) {
+            System.err.println("Error fetching value for " + parameterName + ": " + e.getMessage());
             return null;
         }
     }

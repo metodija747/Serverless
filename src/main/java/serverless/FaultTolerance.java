@@ -44,6 +44,10 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
         String functionName = functionInfo.getFunctionArn();
         int retries = functionInfo.getRetries();
 
+        if (isCircuitOpen(functionName)) {
+            return fallbackResponse(functionName);
+        }
+
         for (int attempt = 1; attempt <= retries; attempt++) {
             if (isCircuitOpen(functionName)) {
                 return fallbackResponse(functionName);
@@ -101,6 +105,8 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                 .build();
 
         QueryResponse queryResponse = dynamoDB.query(queryRequest);
+        System.out.println("" + queryResponse.count());
+
         return queryResponse.count() >= 10;  // Assume circuit is open if 10 or more errors are found
     }
 

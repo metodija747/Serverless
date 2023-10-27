@@ -41,11 +41,7 @@ Resources:
             - Effect: Allow
               Action:
                 - ssm:GetParameter
-              Resource:
-                - arn:aws:ssm:us-east-1:824949725598:parameter/USER_POOL_ID
-                - arn:aws:ssm:us-east-1:824949725598:parameter/CLIENT_APP_ID
-                - arn:aws:ssm:us-east-1:824949725598:parameter/DYNAMO_REGION
-                - arn:aws:ssm:us-east-1:824949725598:parameter/PRODUCT_TABLEI
+              Resource: "*"
             - Effect: Allow
               Action:
                 - cloudwatch:PutMetricData

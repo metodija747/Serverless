@@ -73,8 +73,8 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                     String simpleErrorMessage = "Error Message: " + errorObject.get("errorMessage").getAsString() +
                             ", Error Type: " + errorObject.get("errorType").getAsString();
                     logError(functionName, new Exception(simpleErrorMessage));
+                    System.out.println("" + simpleErrorMessage);
 
-                    logError(functionName, new Exception(responseJson));
                     if (attempt < retries) {
                         Thread.sleep(1000);
                     }

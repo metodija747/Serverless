@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 public class GetAndSearchProducts implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     private static final Gson gson = new Gson();
+    private static final ConfigManager configManager = new ConfigManager();
+
 
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
@@ -29,7 +31,6 @@ public class GetAndSearchProducts implements RequestHandler<Map<String, Object>,
 
     public Map<String, Object> getAndSearchProducts(Map<String, Object> event) {
         try {
-            ConfigManager configManager = new ConfigManager();
             String REGION =configManager.get("DYNAMO_REGION");
             String PRODUCT_TABLE = configManager.get("PRODUCT_TABLEI");
             DynamoDbClient dynamoDB = DynamoDbClient.builder()

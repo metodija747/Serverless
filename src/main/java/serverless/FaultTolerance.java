@@ -76,6 +76,8 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
 
                 // Check if the Lambda function has thrown an error
                 if (invokeResponse.functionError() != null) {
+                    System.err.println("" + invokeResponse + " " + invokeResponse.functionError());
+
                     metricsHandler.incrementCallsFailed();
                     JsonParser parser = new JsonParser();
                     JsonObject errorObject = parser.parse(responseJson).getAsJsonObject();

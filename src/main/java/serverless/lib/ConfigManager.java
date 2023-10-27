@@ -46,7 +46,7 @@ public class ConfigManager {
         overrideIfNotNull("ISSUER");
         overrideIfNotNull("CART_TABLE");
         overrideIfNotNull("ORDERS_TABLE");
-        overrideIfNotNull("PRODUCT_TABLE");
+        overrideIfNotNull("PRODUCT_TABLEI");
     }
 
     private void overrideIfNotNull(String key) {

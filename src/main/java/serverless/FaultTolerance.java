@@ -27,7 +27,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
 
     static {
         functionMap.put("GET:/dispatcher/catalog", new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetAndSearchProductsFunctioni-Fia94NeRCooH", 3));
-        // ... add   other mappings
+        // ... add    other mappings
     }
 
     @Override

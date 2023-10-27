@@ -65,13 +65,15 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                 // Check if the responseMap contains an error key
                 if (responseMap.containsKey("error")) {
                     logError(functionName, new Exception("Lambda returned an error: " + responseMap.get("error")));
-                    return null;  // Or return an appropriate error response
+                    continue;
                 }
-
                 return responseMap;
 
             } catch (Exception e) {
                 logError(functionName, e);
+                if (attempt == retries) {
+                    return fallbackResponse(functionName);
+                }
             }
         }
 

@@ -72,10 +72,8 @@ jobs:
 #            fi
 #          done
 
-      - name: Compile and Run Java Program
-        run: |
-          javac -d . ./src/main/java/serverless/lib/OpenApiDocumentationGenerator.java
-          java serverless.lib.OpenApiDocumentationGenerator
+      - name: Build and Run with Maven
+        run: mvn clean compile exec:java -Dexec.mainClass="serverless.lib.OpenApiDocumentationGenerator"
 
       - name: Deploy openapi.json to S3
         uses: jakejarvis/s3-sync-action@v0.5.1
@@ -88,7 +86,7 @@ jobs:
           AWS_REGION: 'us-east-1'
           SOURCE_DIR: 'C:\Users\HP\Desktop\FaultTolerance\openapi.json'
 
-      - name: Build and Deploy
+      - name: Build and Deploy with SAM
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

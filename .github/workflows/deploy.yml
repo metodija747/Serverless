@@ -72,6 +72,22 @@ jobs:
 #            fi
 #          done
 
+      - name: Compile and Run Java Program
+        run: |
+          javac -d . C:\Users\HP\Desktop\FaultTolerance\src\main\java\serverless\lib\OpenApiDocumentationGenerator.java
+          java serverless.lib.OpenApiDocumentationGenerator
+
+      - name: Deploy openapi.json to S3
+        uses: jakejarvis/s3-sync-action@v0.5.1
+        with:
+          args: --acl public-read --follow-symlinks
+        env:
+          AWS_S3_BUCKET: metodija747
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1'
+          SOURCE_DIR: 'C:\Users\HP\Desktop\FaultTolerance\openapi.json'
+
       - name: Build and Deploy
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

@@ -11,6 +11,7 @@ import serverless.lib.ResponseTransformer;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
+import serverless.lib.LambdaDocumentationAnnotations.*;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -21,6 +22,22 @@ public class GetAndSearchProducts implements RequestHandler<Map<String, Object>,
 
     private static final Gson gson = new Gson();
 
+    @LambdaOperation(
+            summary = "Get Products",
+            description = "This endpoint allows users to get a list of products."
+    )
+    @LambdaParameters({
+            @LambdaParameter(name = "searchTerm", description = "Search term for filtering products", in = ParameterIn.QUERY, example = "Clock"),
+            @LambdaParameter(name = "sortBy", description = "Field to sort by", in = ParameterIn.QUERY, example = "Price", schema = @LambdaSchema(enumeration = {"Price", "AverageRating"})),
+            @LambdaParameter(name = "sortOrder", description = "Sort order", in = ParameterIn.QUERY, example = "ASC", schema = @LambdaSchema(enumeration = {"ASC", "DSC"})),
+            @LambdaParameter(name = "category", description = "Category for filtering products", in = ParameterIn.QUERY, example = "Timepiece", schema = @LambdaSchema(enumeration = {"All", "Jewelry", "Timepiece", "Games"})),
+            @LambdaParameter(name = "page", description = "Page number", in = ParameterIn.QUERY, example = "1"),
+            @LambdaParameter(name = "pageSize", description = "Page size", in = ParameterIn.QUERY, example = "4")
+    })
+    @LambdaAPIResponses({
+            @LambdaAPIResponse(responseCode = 200, description = "Successfully obtained products list."),
+            @LambdaAPIResponse(responseCode = 500, description = "Internal Server Error.")
+    })
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
         return getAndSearchProducts(event);

@@ -74,7 +74,7 @@ jobs:
 
       - name: Compile and Run Java Program
         run: |
-          javac -d . C:\\Users\\HP\\Desktop\\FaultTolerance\\src\\main\\java\\serverless\\lib\\OpenApiDocumentationGenerator.java
+          javac -d . ./src/main/java/serverless/lib/OpenApiDocumentationGenerator.java
           java serverless.lib.OpenApiDocumentationGenerator
 
       - name: Deploy openapi.json to S3

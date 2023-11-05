@@ -34,7 +34,7 @@ Resources:
       Runtime: java11
       MemorySize: 512
       Tracing: Active
-      ReservedConcurrentExecutions: 10
+      ReservedConcurrentExecutions: 5
       Policies:
         - AmazonDynamoDBFullAccess
         - Version: '2012-10-17'
@@ -65,7 +65,7 @@ Resources:
   GetProductFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ServerlessFunction
+      CodeUri:
       Handler: serverless.CatalogProduct.GetProduct::handleRequest
       Runtime: java11
       MemorySize: 512

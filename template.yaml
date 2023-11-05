@@ -34,7 +34,6 @@ Resources:
       Runtime: java11
       MemorySize: 512
       Tracing: Active
-      ReservedConcurrentExecutions: 5
       Policies:
         - AmazonDynamoDBFullAccess
         - Version: '2012-10-17'

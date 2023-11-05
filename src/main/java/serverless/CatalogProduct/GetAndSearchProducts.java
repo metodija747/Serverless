@@ -23,9 +23,7 @@ public class GetAndSearchProducts implements RequestHandler<Map<String, Object>,
     private static final Gson gson = new Gson();
 
     @LambdaOperation(
-            summary = "Get Products",
-            description = "This endpoint allows users to get a list of products."
-    )
+            summary = "Get Products", description = "This endpoint allows users to get a list of products.", path = "/catalog", method = "get")
     @LambdaParameters({
             @LambdaParameter(name = "searchTerm", description = "Search term for filtering products", in = ParameterIn.QUERY, example = "Clock"),
             @LambdaParameter(name = "sortBy", description = "Field to sort by", in = ParameterIn.QUERY, example = "Price", schema = @LambdaSchema(enumeration = {"Price", "AverageRating"})),

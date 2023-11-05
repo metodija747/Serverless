@@ -1,6 +1,5 @@
 package serverless.lib;
 
-//import io.swagger.models.Operation;
 import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
@@ -8,7 +7,6 @@ import io.swagger.v3.oas.models.parameters.*;
 import io.swagger.v3.oas.models.responses.*;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-//import io.swagger.models.*;
 
 import io.swagger.v3.oas.models.servers.Server;
 import serverless.lib.LambdaDocumentationAnnotations.*;
@@ -16,19 +14,24 @@ import serverless.lib.LambdaDocumentationAnnotations.*;
 public class OpenApiGenerator {
 
     private OpenAPI openAPI;
-
     public OpenApiGenerator() {
-        this.openAPI = new OpenAPI();
-        Info info = new Info()
-                .title("Your API Title")
-                .version("1.0.0")
-                .description("Description of your API.");
-        openAPI.setInfo(info);
+        this(new OpenAPI());
+    }
 
-        // Setting the base server URL
-        Server server = new Server();
-        server.setUrl("https://xr51u2pzwg.execute-api.us-east-1.amazonaws.com/Stage/dispatcher");
-        openAPI.addServersItem(server);
+    public OpenApiGenerator(OpenAPI existingOpenAPI) {
+        this.openAPI = existingOpenAPI;
+        if (this.openAPI.getInfo() == null) {
+            Info info = new Info()
+                    .title("Your API Title")
+                    .version("1.0.0")
+                    .description("Description of your API.");
+            openAPI.setInfo(info);
+
+            // Setting the base server URL
+            Server server = new Server();
+            server.setUrl("https://xr51u2pzwg.execute-api.us-east-1.amazonaws.com/Stage/dispatcher");
+            openAPI.addServersItem(server);
+        }
     }
 
     public OpenAPI generateFromLambda(Class<?> lambdaClass) {
@@ -74,9 +77,25 @@ public class OpenApiGenerator {
                     operation.setResponses(apiResponses);
                 }
 
-                // Add the constructed operation to the OpenAPI model (assuming a GET method for this example)
-                PathItem pathItem = new PathItem().get(operation);
-                openAPI.path("/catalog", pathItem); // Replace "/your-path-here" with the actual path for your Lambda function
+                String httpMethod = operationAnnotation.method().toLowerCase();
+                PathItem pathItem = new PathItem();
+                switch (httpMethod) {
+                    case "get":
+                        pathItem.setGet(operation);
+                        break;
+                    case "post":
+                        pathItem.setPost(operation);
+                        break;
+                    case "put":
+                        pathItem.setPut(operation);
+                        break;
+                    case "delete":
+                        pathItem.setDelete(operation);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unsupported HTTP method: " + httpMethod);
+                }
+                openAPI.path(operationAnnotation.path(), pathItem);
             }
         }
         return openAPI;

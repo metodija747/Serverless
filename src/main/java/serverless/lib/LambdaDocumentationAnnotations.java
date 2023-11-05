@@ -12,6 +12,8 @@ public final class LambdaDocumentationAnnotations {
     public @interface LambdaOperation {
         String summary();
         String description() default "";
+        String path();
+        String method();
     }
 
     @Retention(RetentionPolicy.RUNTIME)

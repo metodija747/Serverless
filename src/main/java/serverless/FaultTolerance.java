@@ -19,32 +19,40 @@ import software.amazon.awssdk.services.lambda.model.InvokeResponse;
 
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     LambdaClient lambdaClient = LambdaClient.builder().build();
     DynamoDbClient dynamoDB = DynamoDbClient.builder().build();
     private static final String DYNAMODB_TABLE = "ErrorTracker";
-    private static final Map<String, FunctionInfo> functionMap = new HashMap<>();
+    private static final Map<Pattern, FunctionInfo> functionMap = new LinkedHashMap<>();
     static {
-        functionMap.put("GET:/dispatcher/catalog", new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetAndSearchProductsFunctioni-Fia94NeRCooH", 3));
-        // ... add    other mappings
-    }
-    private static final Map<String, String> FUNCTION_NAME_MAPPING = new HashMap<>();
-    static {
-        FUNCTION_NAME_MAPPING.put("GET:/dispatcher/catalog", "GetAndSearchProductsFunctioni");
+        functionMap.put(Pattern.compile("GET:/dispatcher/catalog$"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetAndSearchProductsFunctioni-Fia94NeRCooH", 3));
+        functionMap.put(Pattern.compile("GET:/dispatcher/catalog/.+"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetProductFunction", 3));
         // ... add other mappings
     }
+
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
         MetricsHandler metricsHandler = new MetricsHandler();
         String httpMethod = (String) event.get("httpMethod");
         String path = (String) event.get("path");
         String key = httpMethod + ":" + path;
-        String lambdaFunctionName = FUNCTION_NAME_MAPPING.get(key);
-        metricsHandler.setLambdaFunctionName(lambdaFunctionName);
-        FunctionInfo functionInfo = functionMap.get(key);
+
+        FunctionInfo functionInfo = null;
+        for (Map.Entry<Pattern, FunctionInfo> entry : functionMap.entrySet()) {
+            if (entry.getKey().matcher(key).matches()) {
+                functionInfo = entry.getValue();
+                metricsHandler.setLambdaFunctionName(getFunctionNameFromARN(functionInfo.getFunctionArn()));
+                break;
+            }
+        }
+
         if (functionInfo == null) {
             return ResponseGenerator.generateResponse(400, "Invalid path or method");
         }
@@ -124,6 +132,11 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
         }
         metricsHandler.incrementFallbackCalls();
         return fallbackResponse(functionName);  // retries exhausted or circuit is open, return fallback response
+    }
+
+    private String getFunctionNameFromARN(String arn) {
+        String[] parts = arn.split(":");
+        return parts[parts.length - 1];
     }
 
     private boolean isCircuitOpen(String serviceName) {

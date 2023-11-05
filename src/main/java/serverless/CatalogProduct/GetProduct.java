@@ -41,7 +41,7 @@ public class GetProduct implements RequestHandler<Map<String, Object>, Map<Strin
     public Map<String, Object> getProduct(Map<String, Object> event) {
         try {
             String REGION = configManager.get("DYNAMO_REGION");
-            String PRODUCT_TABLE = configManager.get("PRODUCT_TABLE");
+            String PRODUCT_TABLE = configManager.get("PRODUCT_TABLEI");
 
             DynamoDbClient dynamoDB = DynamoDbClient.builder()
                     .region(Region.of(REGION))

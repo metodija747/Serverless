@@ -50,6 +50,7 @@ public class GetProduct implements RequestHandler<Map<String, Object>, Map<Strin
             Map<String, String> pathParameters = (Map<String, String>) event.get("pathParameters");
             Map<String, AttributeValue> key = new HashMap<>();
             key.put("productId", AttributeValue.builder().s(pathParameters.get("productId")).build());
+            System.out.println(pathParameters.get("productId") + " " + pathParameters);
             GetItemRequest request = GetItemRequest.builder()
                     .key(key)
                     .tableName(PRODUCT_TABLE)

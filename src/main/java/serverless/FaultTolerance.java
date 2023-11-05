@@ -33,7 +33,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
         functionMap.put(Pattern.compile("GET:/dispatcher/catalog$"),
                 new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetAndSearchProductsFunctioni-Fia94NeRCooH", 3));
         functionMap.put(Pattern.compile("GET:/dispatcher/catalog/.+"),
-                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetProductFunction", 3));
+                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetProductFunction-cyZJ6jck5ci9", 3));
         // ... add other mappings
     }
 

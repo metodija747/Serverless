@@ -43,7 +43,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
         String httpMethod = (String) event.get("httpMethod");
         String path = (String) event.get("path");
         String key = httpMethod + ":" + path;
-
+        System.out.println("TUKA: " + event);
         FunctionInfo functionInfo = null;
         for (Map.Entry<Pattern, FunctionInfo> entry : functionMap.entrySet()) {
             if (entry.getKey().matcher(key).matches()) {

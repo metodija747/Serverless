@@ -131,8 +131,10 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
         JsonObject metricsJson = configJson.getAsJsonObject("METRICS");
         String timeRange = metricsJson.get("TIME_RANGE").getAsString();
         long startTime = Instant.now().minusMillis(Long.parseLong(timeRange)).toEpochMilli();
-
-        CloudWatchClient cw = CloudWatchClient.builder().build();
+        System.out.println("VREME NA POCETOK " + startTime);
+        CloudWatchClient cw = CloudWatchClient.builder()
+                .region(Region.US_EAST_1)
+                .build();
 
         Map<String, Object> metricsResponse = new HashMap<>();
         for (JsonElement functionElement : metricsJson.getAsJsonArray("FUNCTIONS")) {
@@ -167,6 +169,8 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
                     .metricDataQueries(metricQueries)
                     .build();
             GetMetricDataResponse response = cw.getMetricData(request);
+            System.out.println("EVE STO DOBIV OD CLOUDWATCH " + response);
+
             Map<String, Object> functionMetricsResponse = new HashMap<>();
             for (MetricDataResult result : response.metricDataResults()) {
                 if (result.values().isEmpty()) {  // Check if metric data is empty

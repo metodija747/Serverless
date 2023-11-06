@@ -61,18 +61,19 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
         ListTablesResponse listTablesResponse = dynamoDB.listTables();
         List<String> availableTables = listTablesResponse.tableNames();
 
-        Map<String, Object> response = new HashMap<>();
+        Map<String, Object> finalResponse = new HashMap<>();
+        List<Map<String, String>> datasourcesStatus = new ArrayList<>();
 
         for (var datasourceElement : datasources) {
+            Map<String, String> singleTableStatus = new HashMap<>();
             String tableName = datasourceElement.getAsString();
-            if (availableTables.contains(tableName)) {
-                response.put(tableName, "UP");
-            } else {
-                response.put(tableName, "DOWN");
-            }
+            singleTableStatus.put("TABLE", tableName);
+            singleTableStatus.put("STATUS", availableTables.contains(tableName) ? "UP" : "DOWN");
+            datasourcesStatus.add(singleTableStatus);
         }
 
-        return response;
+        finalResponse.put("DATASOURCES", datasourcesStatus);
+        return finalResponse;
     }
 
     public Map<String, Object> checkHttpResources() {
@@ -89,7 +90,7 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
 
         var httpResources = configJson.getAsJsonArray("HTTP_RESOURCE");
 
-        Map<String, Object> httpChecks = new HashMap<>();
+        List<Map<String, String>> httpResourcesStatus = new ArrayList<>();
 
         for (var resourceElement : httpResources) {
             Map<String, String> httpResponse = new HashMap<>();
@@ -107,10 +108,12 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
             }
             httpResponse.put("link", resourceUrl);
             httpResponse.put("status", status);
-            httpChecks.put(resourceUrl, httpResponse);
+            httpResourcesStatus.add(httpResponse);
         }
 
-        return httpChecks;
+        Map<String, Object> finalResponse = new HashMap<>();
+        finalResponse.put("HTTP_CHECK", httpResourcesStatus);
+        return finalResponse;
     }
 
 

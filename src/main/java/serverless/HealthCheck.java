@@ -27,21 +27,34 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
 
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
-        Map<String, Object> dbStatus = checkDatabases();
-        Map<String, Object> httpStatus = checkHttpResources();
-        Map<String, Object> metricsStatus = checkMetrics();
+        Object healthConfig = configManager.get("HEALTH");
+        if (healthConfig == null) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("statusCode", 200);
+            response.put("body", "HEALTH CHECKS WERE NOT SET UP");
+            return response;
+        }
+        JsonObject configJson = fetchHealthConfig();
+
         Map<String, Object> combinedStatus = new HashMap<>();
-        combinedStatus.putAll(dbStatus);
-        combinedStatus.putAll(httpStatus);
-        combinedStatus.putAll(metricsStatus);
+
+        if (configJson.has("DATASOURCES")) {
+            combinedStatus.putAll(checkDatabases());
+        }
+        if (configJson.has("HTTP_RESOURCE")) {
+            combinedStatus.putAll(checkHttpResources());
+        }
+        if (configJson.has("METRICS")) {
+            combinedStatus.putAll(checkMetrics());
+        }
+
         Map<String, Object> response = new HashMap<>();
         response.put("statusCode", 200);
         response.put("body", gson.toJson(combinedStatus));
         return response;
     }
 
-    public Map<String, Object> checkDatabases() {
-        String REGION = (String) configManager.get("DYNAMO_REGION");
+    private JsonObject fetchHealthConfig() {
         Object healthConfig = configManager.get("HEALTH");
         JsonObject configJson;
         if (healthConfig instanceof String) {
@@ -52,6 +65,13 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
         } else {
             throw new RuntimeException("Unexpected type for 'HEALTH' configuration.");
         }
+        return configJson;
+    }
+
+    public Map<String, Object> checkDatabases() {
+        String REGION = (String) configManager.get("DYNAMO_REGION");
+        JsonObject configJson = fetchHealthConfig();
+
         var datasources = configJson.getAsJsonArray("DATASOURCES");
 
         DynamoDbClient dynamoDB = DynamoDbClient.builder()
@@ -77,17 +97,7 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
     }
 
     public Map<String, Object> checkHttpResources() {
-        Object healthConfig = configManager.get("HEALTH");
-        JsonObject configJson;
-        if (healthConfig instanceof String) {
-            configJson = gson.fromJson((String) healthConfig, JsonObject.class);
-        } else if (healthConfig instanceof Map) {
-            String jsonStr = gson.toJson(healthConfig);
-            configJson = gson.fromJson(jsonStr, JsonObject.class);
-        } else {
-            throw new RuntimeException("Unexpected type for 'HEALTH' configuration.");
-        }
-
+        JsonObject configJson = fetchHealthConfig();
         var httpResources = configJson.getAsJsonArray("HTTP_RESOURCE");
 
         List<Map<String, String>> httpResourcesStatus = new ArrayList<>();
@@ -118,16 +128,8 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
 
 
     public Map<String, Object> checkMetrics() {
-        Object healthConfig = configManager.get("HEALTH");
-        JsonObject configJson;
-        if (healthConfig instanceof String) {
-            configJson = gson.fromJson((String) healthConfig, JsonObject.class);
-        } else if (healthConfig instanceof Map) {
-            String jsonStr = gson.toJson(healthConfig);
-            configJson = gson.fromJson(jsonStr, JsonObject.class);
-        } else {
-            throw new RuntimeException("Unexpected type for 'HEALTH' configuration.");
-        }
+        JsonObject configJson = fetchHealthConfig();
+
         JsonObject metricsJson = configJson.getAsJsonObject("METRICS");
         String timeRange = metricsJson.get("TIME_RANGE").getAsString();
         long startTime = Instant.now().minusMillis(Long.parseLong(timeRange)).toEpochMilli();

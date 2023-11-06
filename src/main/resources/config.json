@@ -9,7 +9,6 @@
   "COMMENT_TABLE": "CommentDB",
   "HEALTH": {
     "DATASOURCES": ["CartDB", "OrdersDB", "ProductCatalog", "CommentDB"],
-    "HTTP_RESOURCE": ["https://github.com/metodija747/Serverless.git", "https://outlookss.office.com/mail/"],
     "METRICS": {
       "TIME_RANGE": "60000000",
       "FUNCTIONS": [

@@ -27,11 +27,11 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
 
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
-//        Map<String, Object> dbStatus = checkDatabases();
+        Map<String, Object> dbStatus = checkDatabases();
         Map<String, Object> httpStatus = checkHttpResources();
 //        Map<String, Object> metricsStatus = checkMetrics();
         Map<String, Object> combinedStatus = new HashMap<>();
-//        combinedStatus.putAll(dbStatus);
+        combinedStatus.putAll(dbStatus);
         combinedStatus.putAll(httpStatus);
 //        combinedStatus.putAll(metricsStatus);
         Map<String, Object> response = new HashMap<>();
@@ -40,31 +40,40 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
         return response;
     }
 
-//    public Map<String, Object> checkDatabases() {
-//        String REGION = configManager.get("DYNAMO_REGION");
-//        JsonObject configJson = gson.fromJson(configManager.get("HEALTH"), JsonObject.class);
-//        var datasources = configJson.getAsJsonArray("DATASOURCES");
-//
-//        DynamoDbClient dynamoDB = DynamoDbClient.builder()
-//                .region(Region.of(REGION))
-//                .build();
-//
-//        ListTablesResponse listTablesResponse = dynamoDB.listTables();
-//        List<String> availableTables = listTablesResponse.tableNames();
-//
-//        Map<String, Object> response = new HashMap<>();
-//
-//        for (var datasourceElement : datasources) {
-//            String tableName = datasourceElement.getAsString();
-//            if (availableTables.contains(tableName)) {
-//                response.put(tableName, "UP");
-//            } else {
-//                response.put(tableName, "DOWN");
-//            }
-//        }
-//
-//        return response;
-//    }
+    public Map<String, Object> checkDatabases() {
+        String REGION = (String) configManager.get("DYNAMO_REGION");
+        Object healthConfig = configManager.get("HEALTH");
+        JsonObject configJson;
+        if (healthConfig instanceof String) {
+            configJson = gson.fromJson((String) healthConfig, JsonObject.class);
+        } else if (healthConfig instanceof Map) {
+            String jsonStr = gson.toJson(healthConfig);
+            configJson = gson.fromJson(jsonStr, JsonObject.class);
+        } else {
+            throw new RuntimeException("Unexpected type for 'HEALTH' configuration.");
+        }
+        var datasources = configJson.getAsJsonArray("DATASOURCES");
+
+        DynamoDbClient dynamoDB = DynamoDbClient.builder()
+                .region(Region.of(REGION))
+                .build();
+
+        ListTablesResponse listTablesResponse = dynamoDB.listTables();
+        List<String> availableTables = listTablesResponse.tableNames();
+
+        Map<String, Object> response = new HashMap<>();
+
+        for (var datasourceElement : datasources) {
+            String tableName = datasourceElement.getAsString();
+            if (availableTables.contains(tableName)) {
+                response.put(tableName, "UP");
+            } else {
+                response.put(tableName, "DOWN");
+            }
+        }
+
+        return response;
+    }
 
     public Map<String, Object> checkHttpResources() {
         Object healthConfig = configManager.get("HEALTH");
@@ -81,9 +90,9 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
         var httpResources = configJson.getAsJsonArray("HTTP_RESOURCE");
 
         Map<String, Object> httpChecks = new HashMap<>();
-        Map<String, String> httpResponse = new HashMap<>();
 
         for (var resourceElement : httpResources) {
+            Map<String, String> httpResponse = new HashMap<>();
             String resourceUrl = resourceElement.getAsString();
             String status = "DOWN";
             try {
@@ -95,14 +104,15 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
                 }
             } catch (Exception e) {
                 System.out.println(e.getMessage());
-             }
+            }
             httpResponse.put("link", resourceUrl);
             httpResponse.put("status", status);
-            httpChecks.put("HTTP_CHECK", httpResponse);
+            httpChecks.put(resourceUrl, httpResponse);
         }
 
         return httpChecks;
     }
+
 
 //    public Map<String, Object> checkMetrics() {
 //        JsonObject configJson = gson.fromJson(configManager.get("HEALTH"), JsonObject.class);

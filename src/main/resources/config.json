@@ -22,6 +22,16 @@
             "total_network": 100,
             "tmp_used": 100
           }
+        },
+        {
+          "FUNCTION_NAME": "advancedMetodija747-GetAndSearchProductsFunctioni-Fia94NeRCooH",
+          "THRESHOLDS": {
+            "cpu_total_time": 80,
+            "used_memory_max": 150,
+            "memory_utilization": 30,
+            "total_network": 100,
+            "tmp_used": 100
+          }
         }
       ]
     }

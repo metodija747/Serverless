@@ -152,7 +152,7 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
                                         .namespace("LambdaInsights")
                                         .metricName(metricName)
                                         .dimensions(Dimension.builder()
-                                                .name("FunctionName")
+                                                .name("function_name")
                                                 .value(functionName)
                                                 .build())
                                         .build())

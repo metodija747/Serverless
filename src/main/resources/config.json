@@ -6,5 +6,24 @@
   "CART_TABLE": "CartDB",
   "ORDERS_TABLE": "OrdersDB",
   "PRODUCT_TABLEI": "ProductCatalog",
-  "COMMENT_TABLE": "CommentDB"
+  "COMMENT_TABLE": "CommentDB",
+  "HEALTH": {
+    "DATASOURCES": ["CartDB", "OrdersDB", "ProductCatalog", "CommentDB"],
+    "HTTP_RESOURCE": ["https://github.com/metodija747/Serverless.git"],
+    "METRICS": {
+      "TIME_RANGE": "60_000",
+      "FUNCTIONS": [
+        {
+          "FUNCTION_NAME": "advancedMetodija747-GetProductFunction-cyZJ6jck5ci9",
+          "THRESHOLDS": {
+            "cpu_total_time": 80,
+            "used_memory_max": 150,
+            "memory_utilization": 30,
+            "total_network": 100,
+            "tmp_used": 100
+          }
+        }
+      ]
+    }
+  }
 }

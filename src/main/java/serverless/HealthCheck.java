@@ -147,7 +147,7 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
                         .id("metric" + index)
                         .metricStat(MetricStat.builder()
                                 .metric(Metric.builder()
-                                        .namespace("AWS/LambdaInsights")
+                                        .namespace("LambdaInsights")
                                         .metricName(metricName)
                                         .dimensions(Dimension.builder()
                                                 .name("FunctionName")

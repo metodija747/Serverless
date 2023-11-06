@@ -11,7 +11,7 @@
     "DATASOURCES": ["CartDB", "OrdersDB", "ProductCatalog", "CommentDB"],
     "HTTP_RESOURCE": ["https://github.com/metodija747/Serverless.git", "https://outlookss.office.com/mail/"],
     "METRICS": {
-      "TIME_RANGE": "600000",
+      "TIME_RANGE": "6000000",
       "FUNCTIONS": [
         {
           "FUNCTION_NAME": "advancedMetodija747-GetProductFunction-cyZJ6jck5ci9",

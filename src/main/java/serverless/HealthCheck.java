@@ -67,7 +67,17 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
 //    }
 
     public Map<String, Object> checkHttpResources() {
-        JsonObject configJson = gson.fromJson(configManager.get("HEALTH"), JsonObject.class);
+        Object healthConfig = configManager.get("HEALTH");
+        JsonObject configJson;
+        if (healthConfig instanceof String) {
+            configJson = gson.fromJson((String) healthConfig, JsonObject.class);
+        } else if (healthConfig instanceof Map) {
+            String jsonStr = gson.toJson(healthConfig);
+            configJson = gson.fromJson(jsonStr, JsonObject.class);
+        } else {
+            throw new RuntimeException("Unexpected type for 'HEALTH' configuration.");
+        }
+
         var httpResources = configJson.getAsJsonArray("HTTP_RESOURCE");
 
         Map<String, Object> httpChecks = new HashMap<>();

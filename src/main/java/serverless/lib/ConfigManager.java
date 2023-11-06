@@ -14,7 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class ConfigManager {
-    private Map<String, String> config;
+//    private Map<String, String> config;
+    private Map<String, Object> config;
 
     public ConfigManager() {
         // Load default configuration from config.json
@@ -56,7 +57,10 @@ public class ConfigManager {
         }
     }
 
-    public String get(String key) {
+//    public String get(String key) {
+//        return config.get(key);
+//    }
+    public Object get(String key) {
         return config.get(key);
     }
 

@@ -45,8 +45,8 @@ public class GetAndSearchProducts implements RequestHandler<Map<String, Object>,
     public Map<String, Object> getAndSearchProducts(Map<String, Object> event) {
         ConfigManager configManager = new ConfigManager();
         try {
-            String REGION =configManager.get("DYNAMO_REGION");
-            String PRODUCT_TABLE = configManager.get("PRODUCT_TABLEI");
+            String REGION = (String)  configManager.get("DYNAMO_REGION");
+            String PRODUCT_TABLE = (String)  configManager.get("PRODUCT_TABLEI");
             DynamoDbClient dynamoDB = DynamoDbClient.builder()
                     .region(Region.of(REGION))
                     .build();

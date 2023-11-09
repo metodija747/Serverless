@@ -44,6 +44,12 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
             @LambdaAPIResponse(responseCode = 403, description = "Forbidden: only admins can add/update products."),
             @LambdaAPIResponse(responseCode = 500, description = "Internal Server Error.")
     })
+    @LambdaSecurityScheme(
+            name = "BearerAuth",
+            type = "http",
+            in = "header",
+            bearerFormat = "JWT"
+    )
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
         try {

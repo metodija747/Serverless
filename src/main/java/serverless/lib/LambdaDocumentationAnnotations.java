@@ -72,4 +72,18 @@ public final class LambdaDocumentationAnnotations {
         LambdaParameter[] value();
     }
 
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE, ElementType.METHOD})
+    public @interface LambdaSecurityScheme {
+        String name();
+        String type();
+        String in();
+        String bearerFormat() default "";
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE, ElementType.METHOD})
+    public @interface LambdaSecurityRequirement {
+        String name();
+    }
 }

@@ -75,9 +75,7 @@ public class GetProduct implements RequestHandler<Map<String, Object>, Map<Strin
 
         } catch (DynamoDbException e) {
             Logger.getLogger(GetProduct.class.getName()).log(Level.SEVERE, "Failed to obtain product details", e);
-            Map<String, String> response = new HashMap<>();
-            response.put("description", "Unable to get product details. Please try again.");
-            return ResponseGenerator.generateResponse(500, gson.toJson(response));
+            throw new RuntimeException("Failed to obtain product details", e);
         }
     }
 }

@@ -7,6 +7,7 @@ import com.amazonaws.xray.entities.Subsegment;
 import com.auth0.jwk.JwkException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import serverless.lib.*;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -56,10 +57,10 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
         try {
             return addNewProduct(event);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error adding product: " + e.getMessage(), e);
             // Instead of a fallback, we directly return an error response
-            return ResponseGenerator.generateResponse(500, gson.toJson("Unable to add new product at the moment."));
-        }
+            Logger.getLogger(GetProduct.class.getName()).log(Level.SEVERE, "Error adding product", e);
+            throw new RuntimeException("Failed to obtain product details", e);
+            }
     }
 
     public Map<String, Object> addNewProduct(Map<String, Object> event) {
@@ -95,17 +96,18 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
         }
 
         Subsegment bodyParamsforNewProduct = AWSXRay.beginSubsegment("extractbodyParamsforNewProduct");
-        Map<String, String> body = gson.fromJson((String) event.get("body"), HashMap.class);
+        Map<String, Object> body = gson.fromJson((String) event.get("body"), new TypeToken<HashMap<String, Object>>(){}.getType());
         String productName = (String) body.get("productName");
         String categoryName = (String) body.get("categoryName");
-        String imageURL =  (String) body.get("imageURL");
-        double price = Double.parseDouble(body.get("price"));
-        String productId = body.containsKey("productId") ? (String) body.get("productId") : UUID.randomUUID().toString();
+        String imageURL = (String) body.get("imageURL");
+        double price = ((Number) body.get("price")).doubleValue(); // Cast to Number, then get double value
+        String productId = body.containsKey("productId") && !((String) body.get("productId")).isEmpty() ? (String) body.get("productId") : UUID.randomUUID().toString();
         String description = (String) body.get("description");
         String beautifulComment = (String) body.get("beautifulComment");
-        int commentsCount = 0; // Initialize commentsCount as 0 for a new product
-        double discountPrice = Double.parseDouble(body.get("discountPrice"));
+        int commentsCount = ((Number) body.get("commentsCount")).intValue(); // Cast to Number, then get int value
+        double discountPrice = ((Number) body.get("discountPrice")).doubleValue(); // Cast to Number, then get double value
         AWSXRay.endSubsegment();
+
 
         Subsegment addNewProductSubSegment = AWSXRay.beginSubsegment("addNewProduct");
         Map<String, AttributeValue> item = new HashMap<>();

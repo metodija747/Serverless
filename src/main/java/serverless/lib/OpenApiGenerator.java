@@ -34,78 +34,41 @@ public class OpenApiGenerator {
             Server server = new Server();
             server.setUrl("https://xr51u2pzwg.execute-api.us-east-1.amazonaws.com/Stage/dispatcher");
             openAPI.addServersItem(server);
+
+            // Ensure components is initialized
+            if (this.openAPI.getComponents() == null) {
+                this.openAPI.setComponents(new Components());
+            }
+            // Define the JWT Security Scheme
+            SecurityScheme jwtSecurityScheme = new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .bearerFormat("JWT")
+                    .in(SecurityScheme.In.HEADER)
+                    .name("Authorization");
+
+            // Add the Security Scheme to the components section
+            openAPI.getComponents().addSecuritySchemes("BearerAuth", jwtSecurityScheme);
         }
     }
 
     public OpenAPI generateFromLambda(Class<?> lambdaClass) {
 
-        // Initialize Components if null
-        if (openAPI.getComponents() == null) {
-            openAPI.setComponents(new Components());
-        }
-
             // Inspect the provided class for annotated methods
             for (Method method : lambdaClass.getDeclaredMethods()) {
-
-                // Check if the method has a @LambdaSecurityScheme annotation
-                if (method.isAnnotationPresent(LambdaSecurityScheme.class)) {
-                    LambdaSecurityScheme methodSecurityScheme = method.getAnnotation(LambdaSecurityScheme.class);
-                    SecurityScheme securityScheme = new SecurityScheme()
-                            .type(SecurityScheme.Type.HTTP) // Assuming that the 'type' is always "http"
-                            .bearerFormat(methodSecurityScheme.bearerFormat())
-                            .name(methodSecurityScheme.name());
-                    openAPI.getComponents().addSecuritySchemes(methodSecurityScheme.name(), securityScheme);
-                }
+                Operation operation = new Operation();
 
                 if (method.isAnnotationPresent(LambdaOperation.class)) {
                     // Process the @LambdaOperation annotation
                     LambdaOperation operationAnnotation = method.getAnnotation(LambdaOperation.class);
-                    Operation operation = new Operation()
-                            .summary(operationAnnotation.summary())
-                            .description(operationAnnotation.description());
+                    operation.setSummary(operationAnnotation.summary());
+                    operation.setDescription(operationAnnotation.description());
 
-                    // Process the @LambdaParameters annotation, if present
-                    if (method.isAnnotationPresent(LambdaParameters.class)) {
-                        LambdaParameters parametersAnnotation = method.getAnnotation(LambdaParameters.class);
-                        for (LambdaParameter paramAnnotation : parametersAnnotation.value()) {
-                            Parameter parameter = new Parameter()
-                                    .name(paramAnnotation.name())
-                                    .description(paramAnnotation.description())
-                                    .in(paramAnnotation.in().name().toLowerCase())
-                                    .example(paramAnnotation.example());
+                    // Get or create the path item for the current path
+                    String httpMethod = method.getAnnotation(LambdaOperation.class).method().toLowerCase();
+                    PathItem existingPathItem = openAPI.getPaths() != null ? openAPI.getPaths().get(method.getAnnotation(LambdaOperation.class).path()) : null;
+                    PathItem pathItem = existingPathItem != null ? existingPathItem : new PathItem();
 
-                            // If there's a schema defined, set it
-                            if (paramAnnotation.schema() != null) {
-                                Schema schema = new Schema();
-                                if (paramAnnotation.schema().enumeration().length > 0) {
-                                    schema.setEnum(Arrays.asList(paramAnnotation.schema().enumeration()));
-                                }
-                                parameter.setSchema(schema);
-                            }
-                            operation.addParametersItem(parameter);
-                        }
-                    }
-
-                    // Check if the method has a @LambdaSecurityRequirement annotation
-                    if (method.isAnnotationPresent(LambdaSecurityRequirement.class)) {
-                        LambdaSecurityRequirement methodSecurityReq = method.getAnnotation(LambdaSecurityRequirement.class);
-                        SecurityRequirement securityRequirement = new SecurityRequirement().addList(methodSecurityReq.name());
-                        operation.addSecurityItem(securityRequirement);
-                    }
-
-                    // Process the @LambdaAPIResponses annotation, if present
-                    if (method.isAnnotationPresent(LambdaAPIResponses.class)) {
-                        LambdaAPIResponses responsesAnnotation = method.getAnnotation(LambdaAPIResponses.class);
-                        ApiResponses apiResponses = new ApiResponses();
-                        for (LambdaAPIResponse respAnnotation : responsesAnnotation.value()) {
-                            ApiResponse apiResponse = new ApiResponse().description(respAnnotation.description());
-                            apiResponses.addApiResponse(String.valueOf(respAnnotation.responseCode()), apiResponse);
-                        }
-                        operation.setResponses(apiResponses);
-                    }
-
-                    String httpMethod = operationAnnotation.method().toLowerCase();
-                    PathItem pathItem = new PathItem();
                     switch (httpMethod) {
                         case "get":
                             pathItem.setGet(operation);
@@ -123,6 +86,46 @@ public class OpenApiGenerator {
                             throw new IllegalArgumentException("Unsupported HTTP method: " + httpMethod);
                     }
                     openAPI.path(operationAnnotation.path(), pathItem);
+                }
+
+                // Process the @LambdaParameters annotation, if present
+                if (method.isAnnotationPresent(LambdaParameters.class)) {
+                    LambdaParameters parametersAnnotation = method.getAnnotation(LambdaParameters.class);
+                    for (LambdaParameter paramAnnotation : parametersAnnotation.value()) {
+                        Parameter parameter = new Parameter()
+                                .name(paramAnnotation.name())
+                                .description(paramAnnotation.description())
+                                .in(paramAnnotation.in().name().toLowerCase())
+                                .example(paramAnnotation.example());
+
+                        // If there's a schema defined, set it
+                        if (paramAnnotation.schema() != null) {
+                            Schema schema = new Schema();
+                            if (paramAnnotation.schema().enumeration().length > 0) {
+                                schema.setEnum(Arrays.asList(paramAnnotation.schema().enumeration()));
+                            }
+                            parameter.setSchema(schema);
+                        }
+                        operation.addParametersItem(parameter);
+                    }
+                }
+
+                // Process the @LambdaAPIResponses annotation, if present
+                if (method.isAnnotationPresent(LambdaAPIResponses.class)) {
+                    LambdaAPIResponses responsesAnnotation = method.getAnnotation(LambdaAPIResponses.class);
+                    ApiResponses apiResponses = new ApiResponses();
+                    for (LambdaAPIResponse respAnnotation : responsesAnnotation.value()) {
+                        ApiResponse apiResponse = new ApiResponse().description(respAnnotation.description());
+                        apiResponses.addApiResponse(String.valueOf(respAnnotation.responseCode()), apiResponse);
+                    }
+                    operation.setResponses(apiResponses);
+                }
+
+                // Add security requirement to the operation if the annotation is present
+                if (method.isAnnotationPresent(LambdaSecurityRequirement.class)) {
+                    LambdaSecurityRequirement securityRequirementAnnotation = method.getAnnotation(LambdaSecurityRequirement.class);
+                    SecurityRequirement securityRequirement = new SecurityRequirement().addList(securityRequirementAnnotation.name());
+                    operation.addSecurityItem(securityRequirement);
                 }
             }
             return openAPI;

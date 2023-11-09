@@ -27,7 +27,7 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
             summary = "Add a new product",
             description = "This endpoint allows admins to add a new product to the product catalog.",
             path = "/catalog",
-            method = "POST"
+            method = "post"
     )
     @LambdaRequestBody(
             description = "Product object that needs to be added to the catalog",
@@ -50,6 +50,7 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
             in = "header",
             bearerFormat = "JWT"
     )
+    @LambdaSecurityRequirement(name = "BearerAuth")
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
         try {

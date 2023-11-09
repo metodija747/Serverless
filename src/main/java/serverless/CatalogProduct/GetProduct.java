@@ -34,6 +34,12 @@ public class GetProduct implements RequestHandler<Map<String, Object>, Map<Strin
             @LambdaAPIResponse(responseCode = 404, description = "Product not found."),
             @LambdaAPIResponse(responseCode = 500, description = "Unable to get product details. Please try again")
     })
+    @LambdaSecurityScheme(
+            name = "BearerAuth",
+            type = "http",
+            in = "header",
+            bearerFormat = "JWT"
+    )
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
         return getProduct(event);

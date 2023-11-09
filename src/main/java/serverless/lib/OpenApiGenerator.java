@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.responses.*;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
@@ -41,10 +42,9 @@ public class OpenApiGenerator {
             }
             // Define the JWT Security Scheme
             SecurityScheme jwtSecurityScheme = new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
                     .scheme("bearer")
-                    .bearerFormat("JWT")
-                    .in(SecurityScheme.In.HEADER)
-                    .name("Authorization");
+                    .bearerFormat("JWT");
 
             // Add the Security Scheme to the components section
             openAPI.getComponents().addSecuritySchemes("BearerAuth", jwtSecurityScheme);

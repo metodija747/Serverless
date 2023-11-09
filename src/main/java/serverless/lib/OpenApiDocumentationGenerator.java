@@ -1,6 +1,8 @@
 package serverless.lib;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.models.OpenAPI;
 import serverless.CatalogProduct.AddNewProduct;
 import serverless.CatalogProduct.GetAndSearchProducts;
@@ -34,6 +36,10 @@ public class OpenApiDocumentationGenerator {
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // Ignore null fields
 
             String openApiJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(aggregatedOpenAPI);
+            JsonNode jsonNode = objectMapper.readTree(openApiJson);
+            // Replace "HTTP" with "http" in the JSON string.
+            ((ObjectNode) jsonNode.at("/components/securitySchemes/BearerAuth")).put("type", "http");
+            openApiJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
 
             // Save to file
             java.nio.file.Files.write(java.nio.file.Paths.get("openapi.json"), openApiJson.getBytes());

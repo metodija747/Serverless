@@ -33,6 +33,7 @@ public class OpenApiDocumentationGenerator {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.addMixIn(io.swagger.v3.oas.models.media.Schema.class, SchemaMixin.class);  // Add the mixin
+            objectMapper.addMixIn(io.swagger.v3.oas.models.media.MediaType.class, SchemaMixin.class);
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // Ignore null fields
 
             String openApiJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(aggregatedOpenAPI);

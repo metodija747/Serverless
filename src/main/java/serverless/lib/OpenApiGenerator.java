@@ -143,7 +143,6 @@ public class OpenApiGenerator {
                     if (!exampleJson.isEmpty()) {
                         // Parse the example JSON string and set it as an example for Swagger UI
                         mediaType.setExample(exampleJson);
-                        mediaType.setExampleSetFlag(false);
                     }
 
                     content.addMediaType("application/json", mediaType);

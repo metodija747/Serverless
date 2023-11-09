@@ -34,6 +34,9 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                 new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetAndSearchProductsFunctioni-Fia94NeRCooH", 3, 4, 30, "Catalog search is currently unavailable."));
         functionMap.put(Pattern.compile("GET:/dispatcher/catalog/.+"),
                 new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetProductFunction-cyZJ6jck5ci9", 3, 4, 30, "Product details cannot be retrieved at this time."));
+        functionMap.put(Pattern.compile("POST:/dispatcher/catalog$"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-AddNewProductFunction-HdY2w0iQiOKY", 3, 4, 30, "Adding or changing product is unavailable."));
+
         // ... add other mappings
     }
 

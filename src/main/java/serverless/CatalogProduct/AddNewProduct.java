@@ -45,12 +45,6 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
             @LambdaAPIResponse(responseCode = 403, description = "Forbidden: only admins can add/update products."),
             @LambdaAPIResponse(responseCode = 500, description = "Internal Server Error.")
     })
-    @LambdaSecurityScheme(
-            name = "BearerAuth",
-            type = "http",
-            in = "header",
-            bearerFormat = "JWT"
-    )
     @LambdaSecurityRequirement(name = "BearerAuth")
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
@@ -59,7 +53,7 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
         } catch (Exception e) {
             // Instead of a fallback, we directly return an error response
             Logger.getLogger(GetProduct.class.getName()).log(Level.SEVERE, "Error adding product", e);
-            throw new RuntimeException("Failed to obtain product details", e);
+            throw new RuntimeException("Error adding product", e);
             }
     }
 

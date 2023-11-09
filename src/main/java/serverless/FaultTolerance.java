@@ -31,9 +31,9 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
     private static final Map<Pattern, FunctionInfo> functionMap = new LinkedHashMap<>();
     static {
         functionMap.put(Pattern.compile("GET:/dispatcher/catalog$"),
-                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetAndSearchProductsFunctioni-Fia94NeRCooH", 3));
+                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetAndSearchProductsFunctioni-Fia94NeRCooH", 3, 4, 30, "Catalog search is currently unavailable."));
         functionMap.put(Pattern.compile("GET:/dispatcher/catalog/.+"),
-                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetProductFunction-cyZJ6jck5ci9", 3));
+                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetProductFunction-cyZJ6jck5ci9", 3, 4, 30, "Product details cannot be retrieved at this time."));
         // ... add other mappings
     }
 
@@ -43,7 +43,6 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
         String httpMethod = (String) event.get("httpMethod");
         String path = (String) event.get("path");
         String key = httpMethod + ":" + path;
-        System.out.println("TUKA: " + event);
         FunctionInfo functionInfo = null;
         for (Map.Entry<Pattern, FunctionInfo> entry : functionMap.entrySet()) {
             if (entry.getKey().matcher(key).matches()) {
@@ -58,19 +57,21 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
         }
 
         String functionName = functionInfo.getFunctionArn();
+        int CircuitOpenThreshold = functionInfo.getCircuitOpenThreshold();
+        long CircuitResetTimeout = functionInfo.getCircuitResetTimeout();
         int retries = functionInfo.getRetries();
 
-        if (isCircuitOpen(functionName)) {
+        if (isCircuitOpen(functionName, CircuitOpenThreshold)) {
             metricsHandler.incrementCallsPrevented();
             metricsHandler.incrementFallbackCalls();
-            return fallbackResponse(functionName);
+            return fallbackResponse(functionInfo.getFallbackMessage());
         }
 
         for (int attempt = 1; attempt <= retries; attempt++) {
-            if (isCircuitOpen(functionName)) {
+            if (isCircuitOpen(functionName, CircuitOpenThreshold)) {
                 metricsHandler.incrementCallsPrevented();
                 metricsHandler.incrementFallbackCalls();
-                return fallbackResponse(functionName);
+                return fallbackResponse(functionInfo.getFallbackMessage());
             }
 
             try {
@@ -91,7 +92,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                     JsonObject errorObject = parser.parse(responseJson).getAsJsonObject();
                     String errorMessage = errorObject.get("errorMessage").getAsString();
                     String simpleErrorMessage = "Error Message: " + errorMessage;
-                    logError(functionName, new Exception(simpleErrorMessage));
+                    logError(functionName, CircuitResetTimeout, new Exception(simpleErrorMessage));
                     if (errorMessage.contains("Task timed out")) {
                         metricsHandler.incrementCallsTimedOut();
                     }else {
@@ -116,7 +117,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
 
                 return responseMap;
             } catch (Exception e) {
-                logError(functionName, e);
+                logError(functionName, CircuitResetTimeout, e);
                 if (attempt < retries) {
                     try {
                         Thread.sleep(1000);  // Introducing a delay of 1 second after catching an exception and before the next retry
@@ -126,12 +127,12 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                 } else {
                     metricsHandler.incrementFailedCalls();
                     metricsHandler.incrementFallbackCalls();
-                    return fallbackResponse(functionName);
+                    return fallbackResponse(functionInfo.getFallbackMessage());
                 }
             }
         }
         metricsHandler.incrementFallbackCalls();
-        return fallbackResponse(functionName);  // retries exhausted or circuit is open, return fallback response
+        return fallbackResponse(functionInfo.getFallbackMessage());  // retries exhausted or circuit is open, return fallback response
     }
 
     private String getFunctionNameFromARN(String arn) {
@@ -139,7 +140,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
         return parts[parts.length - 1];
     }
 
-    private boolean isCircuitOpen(String serviceName) {
+    private boolean isCircuitOpen(String serviceName, int CircuitOpenThreshold) {
         Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
         expressionAttributeValues.put(":serviceName", AttributeValue.builder().s(serviceName).build());
         expressionAttributeValues.put(":now", AttributeValue.builder().n(String.valueOf(System.currentTimeMillis() / 1000)).build());
@@ -153,12 +154,12 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
         QueryResponse queryResponse = dynamoDB.query(queryRequest);
         System.out.println("" + queryResponse.count());
 
-        return queryResponse.count() >= 4;  // Assume circuit is open if 10 or more errors are found
+        return queryResponse.count() >= CircuitOpenThreshold;  // Assume circuit is open if 10 or more errors are found
     }
 
-    private void logError(String serviceName, Exception e) {
+    private void logError(String serviceName, long CircuitResetTimeout, Exception e) {
         long now = System.currentTimeMillis();
-        long resetTime = now / 1000 + 30;  // Reset the circuit after 30 seconds
+        long resetTime = now / 1000 + CircuitResetTimeout;  // Reset the circuit after 30 seconds
 
         Map<String, AttributeValue> item = new HashMap<>();
         item.put("PK", AttributeValue.builder().s(serviceName).build());
@@ -175,17 +176,36 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
 
         }
 
-    private Map<String, Object> fallbackResponse(String functionName) {
-        return ResponseGenerator.generateResponse(500, "Fallback response: Service:" + functionName +  " is temporarily unavailable");
+    private Map<String, Object> fallbackResponse(String fallbackMessage) {
+        return ResponseGenerator.generateResponse(500, fallbackMessage);
     }
 
     public static class FunctionInfo {
         private final String functionArn;
         private final int retries;
+        private final int circuitOpenThreshold;
+        private final long circuitResetTimeout;
+        private final String fallbackMessage;
 
-        public FunctionInfo(String functionArn, int retries) {
+        public FunctionInfo(String functionArn, int retries, int circuitOpenThreshold, long circuitResetTimeout, String fallbackMessage) {
             this.functionArn = functionArn;
             this.retries = retries;
+            this.circuitOpenThreshold = circuitOpenThreshold;
+            this.circuitResetTimeout = circuitResetTimeout;
+            this.fallbackMessage = fallbackMessage;
+
+        }
+
+        public String getFallbackMessage() {
+            return fallbackMessage;
+        }
+
+        public int getCircuitOpenThreshold() {
+            return circuitOpenThreshold;
+        }
+
+        public long getCircuitResetTimeout() {
+            return circuitResetTimeout;
         }
 
         public String getFunctionArn() {

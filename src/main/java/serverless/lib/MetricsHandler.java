@@ -12,8 +12,10 @@ public class MetricsHandler {
     private String lambdaFunctionName;
 
     public MetricsHandler() {
+        ConfigManager configManager = new ConfigManager();
+        String REGION = (String) configManager.get("DYNAMO_REGION");
         this.cloudWatch = CloudWatchClient.builder()
-                .region(Region.US_EAST_1) // Set the region here
+                .region(Region.of(REGION))
                 .build();
         this.namespace = "FaultTolerance";
     }

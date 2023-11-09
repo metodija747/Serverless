@@ -36,7 +36,7 @@ public final class LambdaDocumentationAnnotations {
     public @interface LambdaSchema {
         Class<?> implementation() default Void.class;
         String example() default "";
-        String[] enumeration() default {}; // New field for enumerations
+        String[] enumeration() default {};
     }
 
     @Retention(RetentionPolicy.RUNTIME)

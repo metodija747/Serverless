@@ -2,6 +2,7 @@ package serverless.lib;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.OpenAPI;
+import serverless.CatalogProduct.AddNewProduct;
 import serverless.CatalogProduct.GetAndSearchProducts;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,9 +19,11 @@ public class OpenApiDocumentationGenerator {
     public static void main(String[] args) {
         OpenAPI aggregatedOpenAPI = new OpenAPI();
         OpenApiGenerator generator = new OpenApiGenerator(aggregatedOpenAPI);
+//        insert here all classes for which we added open api specification
         Class<?>[] lambdaClasses = {
                 GetAndSearchProducts.class,
-                GetProduct.class
+                GetProduct.class,
+                AddNewProduct.class
         };
         for (Class<?> lambdaClass : lambdaClasses) {
             generator.generateFromLambda(lambdaClass);

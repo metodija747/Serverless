@@ -33,6 +33,7 @@ Resources:
       Handler: serverless.CatalogProduct.GetAndSearchProducts::handleRequest
       Runtime: java11
       MemorySize: 512
+      Timeout: 30
       Tracing: Active
       Policies:
         - AmazonDynamoDBFullAccess
@@ -68,6 +69,7 @@ Resources:
       Handler: serverless.CatalogProduct.GetProduct::handleRequest
       Runtime: java11
       MemorySize: 512
+      Timeout: 30
       Tracing: Active
       Policies:
         - AmazonDynamoDBFullAccess
@@ -84,6 +86,38 @@ Resources:
                 - arn:aws:ssm:us-east-1:824949725598:parameter/USER_POOL_ID
                 - arn:aws:ssm:us-east-1:824949725598:parameter/CLIENT_APP_ID
                 - arn:aws:ssm:us-east-1:824949725598:parameter/DYNAMO_REGION
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+      Layers:
+        - !Ref SharedLibrariesLayer
+
+  AddNewProductFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.CatalogProduct.AddNewProduct::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Timeout: 30
+      Tracing: Active
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
             - Effect: Allow
               Action:
                 - cloudwatch:PutMetricData

@@ -2,6 +2,8 @@ package serverless.CatalogProduct;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.xray.AWSXRay;
+import com.amazonaws.xray.entities.Subsegment;
 import com.google.gson.Gson;
 import serverless.lib.*;
 import software.amazon.awssdk.regions.Region;
@@ -17,7 +19,6 @@ import java.util.logging.Logger;
 public class GetProduct implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     private static final Gson gson = new Gson();
-    private static final ConfigManager configManager = new ConfigManager(); // Create an instance of ConfigManager
 
     @LambdaOperation(
             summary = "Get Product Details",
@@ -40,8 +41,11 @@ public class GetProduct implements RequestHandler<Map<String, Object>, Map<Strin
 
     public Map<String, Object> getProduct(Map<String, Object> event) {
         try {
+            Subsegment configSubsegment = AWSXRay.beginSubsegment("collectConfigParams");
+            ConfigManager configManager = new ConfigManager();
             String REGION = (String) configManager.get("DYNAMO_REGION");
             String PRODUCT_TABLE = (String)  configManager.get("PRODUCT_TABLEI");
+            AWSXRay.endSubsegment();
 
             DynamoDbClient dynamoDB = DynamoDbClient.builder()
                     .region(Region.of(REGION))

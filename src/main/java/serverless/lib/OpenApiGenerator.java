@@ -8,30 +8,49 @@ import io.swagger.v3.oas.models.responses.*;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import serverless.lib.LambdaDocumentationAnnotations.*;
 
 public class OpenApiGenerator {
 
     private OpenAPI openAPI;
+
     public OpenApiGenerator() {
         this(new OpenAPI());
     }
 
     public OpenApiGenerator(OpenAPI existingOpenAPI) {
-        this.openAPI = existingOpenAPI;
+        this.openAPI = existingOpenAPI != null ? existingOpenAPI : new OpenAPI();
+
+        // Initialize components if they don't exist
+        if (this.openAPI.getComponents() == null) {
+            this.openAPI.setComponents(new Components());
+        }
+
+        // Create and add the JWT Security Scheme to the components
+        SecurityScheme jwtSecurityScheme = new SecurityScheme()
+                .type(SecurityScheme.Type.HTTP) // Define the type as HTTP
+                .scheme("bearer") // Bearer authentication
+                .bearerFormat("JWT") // Format is JWT
+                .in(SecurityScheme.In.HEADER) // Token goes in the header
+                .name("Authorization"); // Name of the header
+
+        this.openAPI.getComponents().addSecuritySchemes("BearerAuth", jwtSecurityScheme);
+
+        // Ensure the Info section is set up
         if (this.openAPI.getInfo() == null) {
             Info info = new Info()
                     .title("Your API Title")
                     .version("1.0.0")
                     .description("Description of your API.");
-            openAPI.setInfo(info);
-
-            // Setting the base server URL
-            Server server = new Server();
-            server.setUrl("https://xr51u2pzwg.execute-api.us-east-1.amazonaws.com/Stage/dispatcher");
-            openAPI.addServersItem(server);
+            this.openAPI.setInfo(info);
         }
+
+        // Setting the base server URL
+        Server server = new Server();
+        server.setUrl("https://xr51u2pzwg.execute-api.us-east-1.amazonaws.com/Stage/dispatcher");
+        this.openAPI.addServersItem(server);
     }
 
     public OpenAPI generateFromLambda(Class<?> lambdaClass) {

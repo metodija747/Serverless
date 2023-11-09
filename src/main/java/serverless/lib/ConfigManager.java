@@ -14,15 +14,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class ConfigManager {
-//    private Map<String, String> config;
     private Map<String, Object> config;
+    private final SsmClient ssmClient;
 
     public ConfigManager() {
-        // Load default configuration from config.json
-        loadDefaultConfig();
+        // Initialize the SSM Client, MAY NEED CHANGE FOR DIFFERENT REGION
+        ssmClient = SsmClient.builder()
+                .region(Region.US_EAST_1)
+                .build();
 
-        // Override with values from Parameter Store
-        overrideWithParameterStore();
+        // Load the default configuration
+        loadDefaultConfig();
     }
 
     private void loadDefaultConfig() {
@@ -35,51 +37,32 @@ public class ConfigManager {
                 config = gson.fromJson(reader, Map.class);
             }
         } catch (Exception e) {
-            // Handle exception, e.g., log error, throw a runtime exception, etc.
             throw new RuntimeException("Failed to load default configuration", e);
         }
     }
-    private void overrideWithParameterStore() {
-        // Override values with Parameter Store if they exist
-        overrideIfNotNull("USER_POOL_ID");
-        overrideIfNotNull("CLIENT_APP_ID");
-        overrideIfNotNull("DYNAMO_REGION");
-        overrideIfNotNull("ISSUER");
-        overrideIfNotNull("CART_TABLE");
-        overrideIfNotNull("ORDERS_TABLE");
-        overrideIfNotNull("PRODUCT_TABLEI");
-    }
 
-    private void overrideIfNotNull(String key) {
-        String value = getParameter(key);
-        if (value != null) {
-            config.put(key, value);
-        }
-    }
-
-//    public String get(String key) {
-//        return config.get(key);
-//    }
     public Object get(String key) {
+        // Try to get the value from the Parameter Store first
+        String parameterValue = getParameter(key);
+        if (parameterValue != null) {
+            // If a value is found, use it and update the config map
+            config.put(key, parameterValue);
+            return parameterValue;
+        }
+        // If not found in the Parameter Store, return the value from the config map (default value)
         return config.get(key);
     }
 
     private String getParameter(String parameterName) {
         try {
-            SsmClient ssmClient = SsmClient.builder()
-                    .region(Region.US_EAST_1)
-                    .build();
-
             GetParameterRequest request = GetParameterRequest.builder()
                     .name(parameterName)
                     .withDecryption(true)
                     .build();
 
             GetParameterResponse response = ssmClient.getParameter(request);
-            System.out.println("Fetched value for " + parameterName + ": " + response.parameter().value());
             return response.parameter().value();
         } catch (Exception e) {
-            System.err.println("Error fetching value for " + parameterName + ": " + e.getMessage());
             return null;
         }
     }

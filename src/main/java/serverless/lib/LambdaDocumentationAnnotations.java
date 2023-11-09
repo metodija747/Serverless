@@ -53,7 +53,7 @@ public final class LambdaDocumentationAnnotations {
     }
 
     public enum ParameterIn {
-        QUERY, HEADER, PATH, COOKIE
+        QUERY, PATH
     }
 
     @Retention(RetentionPolicy.RUNTIME)

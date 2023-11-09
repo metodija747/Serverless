@@ -2,6 +2,8 @@ package serverless.lib;
 
 import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.*;
 import io.swagger.v3.oas.models.responses.*;
@@ -125,6 +127,28 @@ public class OpenApiGenerator {
                     LambdaSecurityRequirement securityRequirementAnnotation = method.getAnnotation(LambdaSecurityRequirement.class);
                     SecurityRequirement securityRequirement = new SecurityRequirement().addList(securityRequirementAnnotation.name());
                     operation.addSecurityItem(securityRequirement);
+                }
+
+                if (method.isAnnotationPresent(LambdaRequestBody.class)) {
+                    LambdaRequestBody requestBodyAnnotation = method.getAnnotation(LambdaRequestBody.class);
+                    RequestBody requestBody = new RequestBody()
+                            .description(requestBodyAnnotation.description())
+                            .required(requestBodyAnnotation.required());
+
+                    Content content = new Content();
+                    MediaType mediaType = new MediaType();
+
+                    // Assuming you have an example JSON string provided in your annotation
+                    String exampleJson = requestBodyAnnotation.content().schema().example();
+
+                    if (!exampleJson.isEmpty()) {
+                        // Parse the example JSON string and set it as an example for Swagger UI
+                        mediaType.setExample(exampleJson);
+                    }
+
+                    content.addMediaType("application/json", mediaType);
+                    requestBody.setContent(content);
+                    operation.setRequestBody(requestBody);
                 }
             }
             return openAPI;

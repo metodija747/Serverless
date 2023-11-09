@@ -45,9 +45,7 @@ public class OpenApiGenerator {
             SecurityScheme jwtSecurityScheme = new SecurityScheme()
                     .type(SecurityScheme.Type.HTTP)
                     .scheme("bearer")
-                    .bearerFormat("JWT")
-                    .name("Authorization") // This is the name of the header where the JWT will be sent.
-                    .in(SecurityScheme.In.HEADER); // This indicates that the security scheme is located in the header.
+                    .bearerFormat("JWT");
 
             // Add the Security Scheme to the components section
             openAPI.getComponents().addSecuritySchemes("BearerAuth", jwtSecurityScheme);

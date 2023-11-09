@@ -41,7 +41,6 @@ public class OpenApiGenerator {
             }
             // Define the JWT Security Scheme
             SecurityScheme jwtSecurityScheme = new SecurityScheme()
-                    .type(SecurityScheme.Type.HTTP)
                     .scheme("bearer")
                     .bearerFormat("JWT")
                     .in(SecurityScheme.In.HEADER)

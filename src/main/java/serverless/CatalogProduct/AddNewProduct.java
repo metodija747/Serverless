@@ -76,6 +76,7 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
 
         Subsegment tokenVerificationSubsegment = AWSXRay.beginSubsegment("authenticatingUser");
         String token = ((Map<String, String>) event.get("headers")).get("Authorization");
+        System.out.println("OVA E TOKENOT: " + token);
         try {
             TokenVerifier.verifyToken(token, ISSUER);
             List<String> groups = TokenVerifier.getGroups(token, ISSUER);

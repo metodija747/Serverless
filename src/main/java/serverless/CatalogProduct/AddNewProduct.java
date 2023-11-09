@@ -80,6 +80,7 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring("Bearer ".length());
         }
+        System.out.println("OVE E TOKENOT" + token);
         try {
             TokenVerifier.verifyToken(token, ISSUER);
             List<String> groups = TokenVerifier.getGroups(token, ISSUER);
@@ -98,12 +99,12 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
         String productName = (String) body.get("productName");
         String categoryName = (String) body.get("categoryName");
         String imageURL =  (String) body.get("imageURL");
-        double price = Double.parseDouble((String) body.get("price"));
+        double price = Double.parseDouble(body.get("price"));
         String productId = body.containsKey("productId") ? (String) body.get("productId") : UUID.randomUUID().toString();
         String description = (String) body.get("description");
         String beautifulComment = (String) body.get("beautifulComment");
         int commentsCount = 0; // Initialize commentsCount as 0 for a new product
-        double discountPrice = Double.parseDouble((String) body.get("discountPrice"));
+        double discountPrice = Double.parseDouble(body.get("discountPrice"));
         AWSXRay.endSubsegment();
 
         Subsegment addNewProductSubSegment = AWSXRay.beginSubsegment("addNewProduct");

@@ -38,19 +38,19 @@ public class OpenApiGenerator {
             server.setUrl("https://xr51u2pzwg.execute-api.us-east-1.amazonaws.com/Stage/dispatcher");
             openAPI.addServersItem(server);
 
-//            // Ensure components is initialized
-//            if (this.openAPI.getComponents() == null) {
-//                this.openAPI.setComponents(new Components());
-//            }
-//            SecurityScheme jwtSecurityScheme = new SecurityScheme()
-//                    .type(SecurityScheme.Type.HTTP)
-//                    .scheme("bearer")
-//                    .bearerFormat("JWT")
-//                    .name("Authorization") // This is the name of the header where the JWT will be sent.
-//                    .in(SecurityScheme.In.HEADER); // This indicates that the security scheme is located in the header.
-//
-//            // Add the Security Scheme to the components section
-//            openAPI.getComponents().addSecuritySchemes("BearerAuth", jwtSecurityScheme);
+            // Ensure components is initialized
+            if (this.openAPI.getComponents() == null) {
+                this.openAPI.setComponents(new Components());
+            }
+            SecurityScheme jwtSecurityScheme = new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .bearerFormat("JWT")
+                    .name("Authorization") // This is the name of the header where the JWT will be sent.
+                    .in(SecurityScheme.In.HEADER); // This indicates that the security scheme is located in the header.
+
+            // Add the Security Scheme to the components section
+            openAPI.getComponents().addSecuritySchemes("BearerAuth", jwtSecurityScheme);
         }
     }
 

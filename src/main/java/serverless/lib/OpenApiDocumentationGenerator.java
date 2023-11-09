@@ -38,7 +38,7 @@ public class OpenApiDocumentationGenerator {
             String openApiJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(aggregatedOpenAPI);
             JsonNode jsonNode = objectMapper.readTree(openApiJson);
             // Replace "HTTP" with "http" in the JSON string.
-//            ((ObjectNode) jsonNode.at("/components/securitySchemes/BearerAuth")).put("type", "http");
+            ((ObjectNode) jsonNode.at("/components/securitySchemes/BearerAuth")).put("type", "http");
             openApiJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
 
             // Save to file

@@ -72,8 +72,8 @@ jobs:
 #            fi
 #          done
 
-#      - name: Build and Run with Maven
-#        run: mvn clean compile exec:java -Dexec.mainClass="serverless.lib.OpenApiDocumentationGenerator"
+      - name: Build and Run with Maven
+        run: mvn clean compile exec:java -Dexec.mainClass="serverless.lib.OpenApiDocumentationGenerator"
 
       - name: Prepare openapi.json for deployment
         run: |

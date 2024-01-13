@@ -23,6 +23,8 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
 
     private static final Gson gson = new Gson();
     private static final Logger logger = Logger.getLogger(AddNewProduct.class.getName());
+    private static DynamoDbClient dynamoDB;
+    private static ConfigManager configManager;
 
     @LambdaOperation(
             summary = "Add a new product",
@@ -49,6 +51,7 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
         try {
+            initializeResources();
             return addNewProduct(event);
         } catch (Exception e) {
             // Instead of a fallback, we directly return an error response
@@ -57,17 +60,25 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
             }
     }
 
+    private synchronized void initializeResources() {
+        if (configManager == null) {
+            configManager = new ConfigManager();
+        }
+        if (dynamoDB == null) {
+            String REGION = (String) configManager.get("DYNAMO_REGION");
+            dynamoDB = DynamoDbClient.builder()
+                    .region(Region.of(REGION))
+                    .build();
+        }
+    }
+
+
     public Map<String, Object> addNewProduct(Map<String, Object> event) {
         Subsegment configSubsegment = AWSXRay.beginSubsegment("collectConfigParams");
-        ConfigManager configManager = new ConfigManager();
-        String REGION = (String) configManager.get("DYNAMO_REGION");
-        String PRODUCT_TABLE = (String) configManager.get("PRODUCT_TABLEI");
-        String ISSUER = (String)  configManager.get("ISSUER");
+        initializeResources();
+        String PRODUCT_TABLE = (String) configManager.get("PRODUCT_TABLE");
+        String ISSUER = (String) configManager.get("ISSUER");
         AWSXRay.endSubsegment();
-
-        DynamoDbClient dynamoDB = DynamoDbClient.builder()
-                .region(Region.of(REGION))
-                .build();
 
         Subsegment tokenVerificationSubsegment = AWSXRay.beginSubsegment("authenticatingUser");
         String authHeader = ((Map<String, String>) event.get("headers")).get("Authorization");
@@ -80,6 +91,7 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
             TokenVerifier.verifyToken(token, ISSUER);
             List<String> groups = TokenVerifier.getGroups(token, ISSUER);
             if (groups == null || !groups.contains("Admins")) {
+                logger.log(Level.SEVERE, "No token provided or user is not admin");
                 return ResponseGenerator.generateResponse(403, gson.toJson("Unauthorized: only admin users can add new products."));
             }
         } catch (JWTVerificationException | JwkException | MalformedURLException e) {

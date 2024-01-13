@@ -129,12 +129,12 @@ public class HealthCheck implements RequestHandler<Map<String, Object>, Map<Stri
 
     public Map<String, Object> checkMetrics() {
         JsonObject configJson = fetchHealthConfig();
-
+        String REGION = (String) configManager.get("DYNAMO_REGION");
         JsonObject metricsJson = configJson.getAsJsonObject("METRICS");
         String timeRange = metricsJson.get("TIME_RANGE").getAsString();
         long startTime = Instant.now().minusMillis(Long.parseLong(timeRange)).toEpochMilli();
         CloudWatchClient cw = CloudWatchClient.builder()
-                .region(Region.US_EAST_1)
+                .region(Region.of(REGION))
                 .build();
 
         Map<String, Object> metricsResponse = new HashMap<>();

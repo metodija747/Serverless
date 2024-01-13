@@ -25,19 +25,49 @@ import java.util.regex.Pattern;
 
 public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
-    LambdaClient lambdaClient = LambdaClient.builder().build();
-    DynamoDbClient dynamoDB = DynamoDbClient.builder().build();
+//    LambdaClient lambdaClient = LambdaClient.builder().build();
+//    DynamoDbClient dynamoDB = DynamoDbClient.builder().build();
+    private static LambdaClient lambdaClient;
+    private static DynamoDbClient dynamoDB;
     private static final String DYNAMODB_TABLE = "ErrorTracker";
     private static final Map<Pattern, FunctionInfo> functionMap = new LinkedHashMap<>();
     static {
         functionMap.put(Pattern.compile("GET:/dispatcher/catalog$"),
-                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetAndSearchProductsFunctioni-Fia94NeRCooH", 3, 4, 30, "Catalog search is currently unavailable."));
+                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetAndSearchProductsFunctioni-Fia94NeRCooH",
+                        3,
+                        4,
+                        30,
+                        "Catalog search is currently unavailable."));
         functionMap.put(Pattern.compile("GET:/dispatcher/catalog/.+"),
-                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetProductFunction-cyZJ6jck5ci9", 3, 4, 30, "Product details cannot be retrieved at this time."));
+                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetProductFunction-cyZJ6jck5ci9",
+                        3,
+                        4,
+                        30,
+                        "Product details cannot be retrieved at this time."));
         functionMap.put(Pattern.compile("POST:/dispatcher/catalog$"),
-                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-AddNewProductFunction-HdY2w0iQiOKY", 3, 4, 30, "Adding or changing product is unavailable."));
+                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-AddNewProductFunction-HdY2w0iQiOKY",
+                        3,
+                        4,
+                        30,
+                        "Adding or changing product is unavailable."));
 
-        // ... add other mappings
+        // ... other mappings
+    }
+
+    // Static initialization block remains unchanged
+
+    private static LambdaClient getLambdaClient() {
+        if (lambdaClient == null) {
+            lambdaClient = LambdaClient.builder().build();
+        }
+        return lambdaClient;
+    }
+
+    private static DynamoDbClient getDynamoDbClient() {
+        if (dynamoDB == null) {
+            dynamoDB = DynamoDbClient.builder().build();
+        }
+        return dynamoDB;
     }
 
     @Override
@@ -83,7 +113,8 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                         .payload(SdkBytes.fromUtf8String(new Gson().toJson(event)))
                         .build();
 
-                InvokeResponse invokeResponse = lambdaClient.invoke(invokeRequest);
+                LambdaClient lambdaClientInstance = getLambdaClient();
+                InvokeResponse invokeResponse = lambdaClientInstance.invoke(invokeRequest);
                 String responseJson = invokeResponse.payload().asUtf8String();
 
                 // Check if the Lambda function has thrown an error
@@ -115,7 +146,6 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                 } else {
                     metricsHandler.incrementSuccessfulCallsWithRetries();
                 }
-                // Parse the response JSON into a Map
                 Map<String, Object> responseMap = new Gson().fromJson(responseJson, Map.class);
 
                 return responseMap;
@@ -123,9 +153,9 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                 logError(functionName, CircuitResetTimeout, e);
                 if (attempt < retries) {
                     try {
-                        Thread.sleep(1000);  // Introducing a delay of 1 second after catching an exception and before the next retry
+                        Thread.sleep(1000);
                     } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt(); // Restore the interrupted status
+                        Thread.currentThread().interrupt();
                     }
                 } else {
                     metricsHandler.incrementFailedCalls();
@@ -154,10 +184,11 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                 .expressionAttributeValues(expressionAttributeValues)
                 .build();
 
-        QueryResponse queryResponse = dynamoDB.query(queryRequest);
+        DynamoDbClient dynamoDbClientInstance = getDynamoDbClient();
+        QueryResponse queryResponse = dynamoDbClientInstance.query(queryRequest);
         System.out.println("" + queryResponse.count());
 
-        return queryResponse.count() >= CircuitOpenThreshold;  // Assume circuit is open if 10 or more errors are found
+        return queryResponse.count() >= CircuitOpenThreshold;
     }
 
     private void logError(String serviceName, long CircuitResetTimeout, Exception e) {
@@ -175,7 +206,8 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                 .item(item)
                 .build();
 
-        dynamoDB.putItem(putItemRequest);
+        DynamoDbClient dynamoDbClientInstance = getDynamoDbClient();
+        dynamoDbClientInstance.putItem(putItemRequest);
 
         }
 

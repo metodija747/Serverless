@@ -19,6 +19,8 @@ import java.util.logging.Logger;
 public class GetProduct implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     private static final Gson gson = new Gson();
+    private static ConfigManager configManager;
+    private static DynamoDbClient dynamoDB;
 
     @LambdaOperation(
             summary = "Get Product Details",
@@ -36,20 +38,27 @@ public class GetProduct implements RequestHandler<Map<String, Object>, Map<Strin
     })
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
+        initializeResources();
         return getProduct(event);
+    }
+
+    private synchronized void initializeResources() {
+        if (configManager == null) {
+            configManager = new ConfigManager();
+        }
+        if (dynamoDB == null) {
+            String REGION = (String) configManager.get("DYNAMO_REGION");
+            dynamoDB = DynamoDbClient.builder()
+                    .region(Region.of(REGION))
+                    .build();
+        }
     }
 
     public Map<String, Object> getProduct(Map<String, Object> event) {
         try {
             Subsegment configSubsegment = AWSXRay.beginSubsegment("collectConfigParams");
-            ConfigManager configManager = new ConfigManager();
-            String REGION = (String) configManager.get("DYNAMO_REGION");
-            String PRODUCT_TABLE = (String)  configManager.get("PRODUCT_TABLEI");
+            String PRODUCT_TABLE = (String) configManager.get("PRODUCT_TABLE");
             AWSXRay.endSubsegment();
-
-            DynamoDbClient dynamoDB = DynamoDbClient.builder()
-                    .region(Region.of(REGION))
-                    .build();
 
             Map<String, String> pathParameters = (Map<String, String>) event.get("pathParameters");
             String proxyValue = pathParameters.get("proxy");

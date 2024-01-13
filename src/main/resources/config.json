@@ -5,7 +5,7 @@
   "ISSUER": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_cl8iVMzUw",
   "CART_TABLE": "CartDB",
   "ORDERS_TABLE": "OrdersDB",
-  "PRODUCT_TABLEI": "ProductCatalog",
+  "PRODUCT_TABLE": "ProductCatalog",
   "COMMENT_TABLE": "CommentDB",
   "HEALTH": {
     "DATASOURCES": ["CartDB", "OrdersDB", "ProductCatalog", "CommentDB"],

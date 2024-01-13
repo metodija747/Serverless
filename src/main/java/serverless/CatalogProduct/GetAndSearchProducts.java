@@ -21,6 +21,9 @@ import java.util.logging.Logger;
 public class GetAndSearchProducts implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     private static final Gson gson = new Gson();
+    private static DynamoDbClient dynamoDB;
+    private static ConfigManager configManager;
+
 
     @LambdaOperation(
             summary = "Get Products", description = "This endpoint allows users to get a list of products.", path = "/catalog", method = "get")
@@ -38,26 +41,36 @@ public class GetAndSearchProducts implements RequestHandler<Map<String, Object>,
     })
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
+        initializeResources();
         return getAndSearchProducts(event);
     }
 
-
-    public Map<String, Object> getAndSearchProducts(Map<String, Object> event) {
-        ConfigManager configManager = new ConfigManager();
-        try {
-            String REGION = (String)  configManager.get("DYNAMO_REGION");
-            String PRODUCT_TABLE = (String)  configManager.get("PRODUCT_TABLEI");
-            DynamoDbClient dynamoDB = DynamoDbClient.builder()
+    private synchronized void initializeResources() {
+        if (configManager == null) {
+            configManager = new ConfigManager();
+        }
+        if (dynamoDB == null) {
+            String REGION = (String) configManager.get("DYNAMO_REGION");
+            dynamoDB = DynamoDbClient.builder()
                     .region(Region.of(REGION))
                     .build();
+        }
+    }
 
+    public Map<String, Object> getAndSearchProducts(Map<String, Object> event) {
+        try {
+            initializeResources();
+            String REGION = (String) configManager.get("DYNAMO_REGION");
+            String PRODUCT_TABLE = (String) configManager.get("PRODUCT_TABLE");
+
+            Subsegment extractingQueryParameters = AWSXRay.beginSubsegment("extractingQueryParameters");
             Map<String, Object> queryStringParameters = new HashMap<>();
             if (event.containsKey("queryStringParameters") && event.get("queryStringParameters") != null) {
                 queryStringParameters = (Map<String, Object>) event.get("queryStringParameters");
             }
             Logger.getLogger(GetAndSearchProducts.class.getName()).info("" + REGION + " " + PRODUCT_TABLE);
 
-            // Ext ract the search term, sorting option, and category from the query string parameters
+            // Extract the search term, sorting option, and category from the query string parameters
             // If no value is provided, default to an empty string or null
             String searchTerm = queryStringParameters.getOrDefault("searchTerm", "").toString().toLowerCase();
             String sortBy = queryStringParameters.getOrDefault("sortBy", "").toString();

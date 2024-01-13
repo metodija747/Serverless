@@ -143,8 +143,15 @@ Resources:
       MemorySize: 512
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AmazonDynamoDBFullAccess
-        - Statement:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+                - dynamodb:GetItem
+              Resource: arn:aws:dynamodb:us-east-1:824949725598:table/ErrorTracker
             - Effect: Allow
               Action:
                 - lambda:InvokeFunction
@@ -163,6 +170,7 @@ Resources:
             Path: /dispatcher/{proxy+}
             Method: ANY
 
+
   HealthCheckFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -172,27 +180,20 @@ Resources:
       MemorySize: 512
       Tracing: Active
       Policies:
-        - AmazonDynamoDBFullAccess
-        - CloudWatchFullAccess
-        - AWSLambdaVPCAccessExecutionRole
+        - Effect: Allow
+          Action:
+            - ssm:GetParameter
+          Resource: "*"
         - Statement:
             - Effect: Allow
               Action:
-                - lambda:InvokeFunction
+                - dynamodb:ListTables
               Resource: "*"
-            - Effect: Allow
-              Action:
-                - ssm:GetParameter
-              Resource: "*"
+        - Statement:
             - Effect: Allow
               Action:
                 - cloudwatch:GetMetricData
                 - cloudwatch:ListMetrics
-              Resource: "*"
-            - Effect: Allow
-              Action:
-                - xray:PutTraceSegments
-                - xray:PutTelemetryRecords
               Resource: "*"
       Environment:
         Variables:
@@ -205,3 +206,4 @@ Resources:
           Properties:
             Path: /health
             Method: GET
+

@@ -33,19 +33,19 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
     private static final Map<Pattern, FunctionInfo> functionMap = new LinkedHashMap<>();
     static {
         functionMap.put(Pattern.compile("GET:/dispatcher/catalog$"),
-                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetAndSearchProductsFunctioni-Fia94NeRCooH",
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-GetAndSearchProductsFunctioni-Wlsr4NgrtglS",
                         3,
                         4,
                         30,
                         "Catalog search is currently unavailable."));
         functionMap.put(Pattern.compile("GET:/dispatcher/catalog/.+"),
-                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-GetProductFunction-cyZJ6jck5ci9",
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-GetProductFunction-54kF1YY5ACYU",
                         3,
                         4,
                         30,
                         "Product details cannot be retrieved at this time."));
         functionMap.put(Pattern.compile("POST:/dispatcher/catalog$"),
-                new FunctionInfo("arn:aws:lambda:us-east-1:824949725598:function:advancedMetodija747-AddNewProductFunction-HdY2w0iQiOKY",
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-AddNewProductFunction-QZm7xYjjHRT1",
                         3,
                         4,
                         30,

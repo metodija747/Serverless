@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// za redeploy
+// za r edeploy
 public class GetProduct implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     private static final Gson gson = new Gson();

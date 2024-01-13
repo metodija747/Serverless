@@ -180,18 +180,12 @@ Resources:
       MemorySize: 512
       Tracing: Active
       Policies:
-        - Effect: Allow
-          Action:
-            - ssm:GetParameter
-          Resource: "*"
-        - Statement:
+        - Version: "2012-10-17"
+          Statement:
             - Effect: Allow
               Action:
+                - ssm:GetParameter
                 - dynamodb:ListTables
-              Resource: "*"
-        - Statement:
-            - Effect: Allow
-              Action:
                 - cloudwatch:GetMetricData
                 - cloudwatch:ListMetrics
               Resource: "*"

@@ -1,7 +1,6 @@
 package serverless.Authorization;
 
 import com.google.gson.reflect.TypeToken;
-import serverless.CatalogProduct.GetProduct;
 import serverless.lib.LambdaDocumentationAnnotations.*;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;

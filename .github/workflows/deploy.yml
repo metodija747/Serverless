@@ -25,29 +25,29 @@ jobs:
           python -m pip install --upgrade pip
           pip install aws-sam-cli
 
-#      - name: Build and Run with Maven
-#        run: mvn clean compile exec:java -Dexec.mainClass="serverless.lib.OpenApiDocumentationGenerator"
-#
-#      - name: Prepare openapi.json for deployment
-#        run: |
-#          mkdir deploy
-#          cp openapi.json deploy/
-#
-#      - name: Deploy to S3
-#        uses: jakejarvis/s3-sync-action@v0.5.1
-#        with:
-#          args: --acl public-read --follow-symlinks
-#        env:
-#          AWS_S3_BUCKET: metodija747
-#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          AWS_REGION: 'us-east-1'
-#          SOURCE_DIR: './deploy'
+      - name: Build and Run with Maven
+        run: mvn clean compile exec:java -Dexec.mainClass="serverless.lib.OpenApiDocumentationGenerator"
 
-#      - name: Build and Deploy with SAM
-#        env:
-#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#        run: |
-#          MAVEN_OPTS="-DskipTests=true" sam build
-#          sam deploy --no-confirm-changeset
+      - name: Prepare openapi.json for deployment
+        run: |
+          mkdir deploy
+          cp openapi.json deploy/
+
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@v0.5.1
+        with:
+          args: --acl public-read --follow-symlinks
+        env:
+          AWS_S3_BUCKET: metodija747
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1'
+          SOURCE_DIR: './deploy'
+
+      - name: Build and Deploy with SAM
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          MAVEN_OPTS="-DskipTests=true" sam build
+          sam deploy --no-confirm-changeset

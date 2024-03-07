@@ -102,7 +102,7 @@ public class SignIn implements RequestHandler<Map<String, Object>, Map<String, O
                     .build();
             InitiateAuthResponse authResponse = cognitoClient.initiateAuth(authRequest);
 
-            // Check if user belongs to the "Admins" group
+            // Check if  user belongs to the "Admins" group
             boolean isAdmin = isAdmin(email, USER_POOL_ID, cognitoClient);
             AWSXRay.endSubsegment(); // End subsegment
 

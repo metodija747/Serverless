@@ -30,6 +30,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
     private static LambdaClient lambdaClient;
     private static DynamoDbClient dynamoDB;
     private static final String DYNAMODB_TABLE = "ErrorTracker";
+    private static final Gson gson = new Gson();
     private static final Map<Pattern, FunctionInfo> functionMap = new LinkedHashMap<>();
     static {
         functionMap.put(Pattern.compile("GET:/dispatcher/catalog$"),
@@ -122,6 +123,13 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                     System.err.println("" + invokeResponse + " " + invokeResponse.functionError());
 
                     metricsHandler.incrementCallsFailed();
+
+                    Map<String, Object> errorResponse = new Gson().fromJson(responseJson, Map.class);
+                    Number statusCode = (Number) errorResponse.get("statusCode");
+                    if (statusCode != null && statusCode.intValue() == 403) {
+                        return ResponseGenerator.generateResponse(403, gson.toJson(errorResponse.get("message")));
+                    }
+
                     JsonParser parser = new JsonParser();
                     JsonObject errorObject = parser.parse(responseJson).getAsJsonObject();
                     String errorMessage = errorObject.get("errorMessage").getAsString();

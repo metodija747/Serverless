@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.models.OpenAPI;
+import serverless.Authorization.RegisterUser;
 import serverless.Authorization.SignIn;
 import serverless.CatalogProduct.AddNewProduct;
 import serverless.CatalogProduct.GetAndSearchProducts;
@@ -27,7 +28,8 @@ public class OpenApiDocumentationGenerator {
                 GetAndSearchProducts.class,
                 GetProduct.class,
                 AddNewProduct.class,
-                SignIn.class
+                SignIn.class,
+                RegisterUser.class
         };
         for (Class<?> lambdaClass : lambdaClasses) {
             generator.generateFromLambda(lambdaClass);

@@ -133,37 +133,37 @@ Resources:
       Layers:
         - !Ref SharedLibrariesLayer
 
-RegisterUserFunction:
-  Type: AWS::Serverless::Function
-  Properties:
-    CodeUri:
-    Handler: serverless.Authorization.RegisterUser::handleRequest
-    Runtime: java11
-    MemorySize: 512
-    Timeout: 30
-    Tracing: Active
-    Policies:
-      - AmazonCognitoPowerUser
-      - Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Action:
-              - ssm:GetParameter
-            Resource: "*"
-          - Effect: Allow
-            Action:
-              - cloudwatch:PutMetricData
-            Resource: "*"
-          - Effect: Allow
-            Action:
-              - xray:PutTraceSegments
-              - xray:PutTelemetryRecords
-            Resource: "*"
-    Environment:
-      Variables:
-        JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
-    Layers:
-      - !Ref SharedLibrariesLayer
+  RegisterUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.Authorization.RegisterUser::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Timeout: 30
+      Tracing: Active
+      Policies:
+        - AmazonCognitoPowerUser
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+      Layers:
+        - !Ref SharedLibrariesLayer
 
   SignInFunction:
     Type: AWS::Serverless::Function

@@ -137,7 +137,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri:
-      Handler: serverless.CatalogProduct.GetComments::handleRequest
+      Handler: serverless.CatalogProduct.GetProductComments::handleRequest
       Runtime: java11
       MemorySize: 1024
       Timeout: 900

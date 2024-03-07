@@ -82,14 +82,17 @@ public class GetOrders implements RequestHandler<Map<String, Object>, Map<String
                     .build();
 
             Subsegment authenticationSubsegment = AWSXRay.beginSubsegment("authenticatingUser");
-            Map<String, String> headers = (Map<String, String>) event.get("headers");
-            String token = headers.get("Authorization").split(" ")[1];
+            String authHeader = ((Map<String, String>) event.get("headers")).get("Authorization");
+            String token = "";
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring("Bearer ".length());
+            }
             String userId;
             try {
                 userId = TokenVerifier.verifyToken(token, ISSUER);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Failed to authenticate user", e);
-                return ResponseGenerator.generateResponse(401, gson.toJson("Invalid token."));
+                return ResponseGenerator.generateResponse(401, gson.toJson("Unauthorized: Invalid token."));
             } finally {
                 AWSXRay.endSubsegment();
             }

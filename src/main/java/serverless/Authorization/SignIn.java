@@ -43,7 +43,7 @@ public class SignIn implements RequestHandler<Map<String, Object>, Map<String, O
     @LambdaAPIResponses({
             @LambdaAPIResponse(responseCode = 200, description = "Successfully logged in"),
             @LambdaAPIResponse(responseCode = 403, description = "Forbidden. Invalid credentials."),
-            @LambdaAPIResponse(responseCode = 500, description = "Internal Server Error")
+            @LambdaAPIResponse(responseCode = 500, description = "Unable to login at the moment. Please try again later.")
     })
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {

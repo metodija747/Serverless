@@ -138,8 +138,8 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
 
                     Map<String, Object> errorResponse = new Gson().fromJson(responseJson, Map.class);
                     Number statusCode = (Number) errorResponse.get("statusCode");
-                    if (statusCode != null && statusCode.intValue() == 403) {
-                        return ResponseGenerator.generateResponse(403, gson.toJson(errorResponse.get("message")));
+                    if (statusCode != null && (statusCode.intValue() == 403 || statusCode.intValue() == 401)) {
+                        return ResponseGenerator.generateResponse(statusCode.intValue(), gson.toJson(errorResponse.get("message")));
                     }
 
                     JsonParser parser = new JsonParser();

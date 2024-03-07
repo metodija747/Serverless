@@ -56,7 +56,7 @@ public class RegisterUser implements RequestHandler<Map<String, Object>, Map<Str
     @LambdaAPIResponses({
             @LambdaAPIResponse(responseCode = 200, description = "User registered successfully"),
             @LambdaAPIResponse(responseCode = 403, description = "Forbidden. User already exists."),
-            @LambdaAPIResponse(responseCode = 500, description = "Internal Server Error")
+            @LambdaAPIResponse(responseCode = 500, description = "Unable to register user at the moment. Please try again later.")
     })
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {

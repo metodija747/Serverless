@@ -37,7 +37,7 @@ public class GetAndSearchProducts implements RequestHandler<Map<String, Object>,
     })
     @LambdaAPIResponses({
             @LambdaAPIResponse(responseCode = 200, description = "Successfully obtained products list."),
-            @LambdaAPIResponse(responseCode = 500, description = "Internal Server Error.")
+            @LambdaAPIResponse(responseCode = 500, description = "Catalog search is currently unavailable.")
     })
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {

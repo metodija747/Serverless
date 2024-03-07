@@ -35,7 +35,7 @@ public class GetProduct implements RequestHandler<Map<String, Object>, Map<Strin
     @LambdaAPIResponses({
             @LambdaAPIResponse(responseCode = 200, description = "Successfully obtained product details."),
             @LambdaAPIResponse(responseCode = 404, description = "Product not found."),
-            @LambdaAPIResponse(responseCode = 500, description = "Unable to get product details. Please try again")
+            @LambdaAPIResponse(responseCode = 500, description = "Product details cannot be retrieved at this time.")
     })
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {

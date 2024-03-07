@@ -45,7 +45,7 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
             @LambdaAPIResponse(responseCode = 200, description = "Product successfully added."),
             @LambdaAPIResponse(responseCode = 401, description = "Unauthorized: Invalid token."),
             @LambdaAPIResponse(responseCode = 403, description = "Forbidden: only admins can add/update products."),
-            @LambdaAPIResponse(responseCode = 500, description = "Internal Server Error.")
+            @LambdaAPIResponse(responseCode = 500, description = "Adding or changing product is unavailable.")
     })
     @LambdaSecurityRequirement(name = "BearerAuth")
     @Override

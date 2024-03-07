@@ -32,8 +32,8 @@ Resources:
       CodeUri:
       Handler: serverless.CatalogProduct.GetAndSearchProducts::handleRequest
       Runtime: java11
-      MemorySize: 512
-      Timeout: 30
+      MemorySize: 1024
+      Timeout: 900
       Tracing: Active
       Policies:
         - AmazonDynamoDBFullAccess
@@ -68,8 +68,8 @@ Resources:
       CodeUri:
       Handler: serverless.CatalogProduct.GetProduct::handleRequest
       Runtime: java11
-      MemorySize: 512
-      Timeout: 30
+      MemorySize: 1024
+      Timeout: 900
       Tracing: Active
       Policies:
         - AmazonDynamoDBFullAccess
@@ -107,8 +107,8 @@ Resources:
       CodeUri:
       Handler: serverless.CatalogProduct.AddNewProduct::handleRequest
       Runtime: java11
-      MemorySize: 512
-      Timeout: 30
+      MemorySize: 1024
+      Timeout: 900
       Tracing: Active
       Policies:
         - AmazonDynamoDBFullAccess
@@ -133,14 +133,79 @@ Resources:
       Layers:
         - !Ref SharedLibrariesLayer
 
+  GetCommentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.CatalogProduct.GetComments::handleRequest
+      Runtime: java11
+      MemorySize: 1024
+      Timeout: 900
+      Tracing: Active
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+      Layers:
+        - !Ref SharedLibrariesLayer
+
+  GetOrdersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.ShoppingCart.GetOrders::handleRequest
+      Runtime: java11
+      MemorySize: 1024
+      Timeout: 900
+      Tracing: Active
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+      Layers:
+        - !Ref SharedLibrariesLayer
+
+
   RegisterUserFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri:
       Handler: serverless.Authorization.RegisterUser::handleRequest
       Runtime: java11
-      MemorySize: 512
-      Timeout: 30
+      MemorySize: 1024
+      Timeout: 900
       Tracing: Active
       Policies:
         - AmazonCognitoPowerUser
@@ -171,8 +236,8 @@ Resources:
       CodeUri:
       Handler: serverless.Authorization.SignIn::handleRequest
       Runtime: java11
-      MemorySize: 512
-      Timeout: 30
+      MemorySize: 1024
+      Timeout: 900
       Tracing: Active
       Policies:
         - AmazonCognitoPowerUser
@@ -203,7 +268,7 @@ Resources:
       CodeUri:
       Handler: serverless.FaultTolerance::handleRequest
       Runtime: java11
-      MemorySize: 512
+      MemorySize: 1024
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: '2012-10-17'

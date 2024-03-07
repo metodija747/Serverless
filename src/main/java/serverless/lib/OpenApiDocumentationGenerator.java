@@ -11,6 +11,8 @@ import serverless.CatalogProduct.GetAndSearchProducts;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import serverless.CatalogProduct.GetProduct;
+import serverless.CatalogProduct.GetProductComments;
+import serverless.ShoppingCart.GetOrders;
 
 public class OpenApiDocumentationGenerator {
 
@@ -29,7 +31,9 @@ public class OpenApiDocumentationGenerator {
                 GetProduct.class,
                 AddNewProduct.class,
                 SignIn.class,
-                RegisterUser.class
+                RegisterUser.class,
+                GetProductComments.class,
+                GetOrders.class
         };
         for (Class<?> lambdaClass : lambdaClasses) {
             generator.generateFromLambda(lambdaClass);

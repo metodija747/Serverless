@@ -38,7 +38,7 @@ public class GetOrders implements RequestHandler<Map<String, Object>, Map<String
     @LambdaAPIResponses({
             @LambdaAPIResponse(responseCode = 200, description = "Orders successfully fetched."),
             @LambdaAPIResponse(responseCode = 401, description = "Unauthorized: Invalid token."),
-            @LambdaAPIResponse(responseCode = 500, description = "Unable to fetch orders.")
+            @LambdaAPIResponse(responseCode = 500, description = "Unable to fetch orders. Please try again later.")
     })
     @LambdaParameters({
             @LambdaParameter(name = "page", description = "Page number for pagination", in = LambdaDocumentationAnnotations.ParameterIn.QUERY, example = "1"),

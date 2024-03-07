@@ -63,6 +63,18 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                         4,
                         30,
                         "Unable to register user at the moment. Please try again later."));
+        functionMap.put(Pattern.compile("GET:/dispatcher/orders$"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-GetOrdersFunction-NWRWJoCOC2mr",
+                        3,
+                        4,
+                        30,
+                        "Unable to fetch orders. Please try again later."));
+        functionMap.put(Pattern.compile("GET:/dispatcher/comments$"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-GetCommentsFunction-8tfTZXaK8H81",
+                        3,
+                        4,
+                        30,
+                        "Unable to get product comments. Please try again"));
 
         // ... other mappings
     }

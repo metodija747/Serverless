@@ -94,24 +94,27 @@ public class GetProductComments implements RequestHandler<Map<String, Object>, M
                     .tableName(COMMENT_TABLE)
                     .keyConditionExpression("productId = :pid")
                     .expressionAttributeValues(Map.of(":pid", AttributeValue.builder().s(productId).build()))
-                    .limit(pageSize)
-                    .exclusiveStartKey(Map.of("productId", AttributeValue.builder().s(productId).build(), "commentId", AttributeValue.builder().s(String.valueOf((page - 1) * pageSize + 1)).build()))
                     .build();
             QueryResponse queryResponse = dynamoDB.query(queryRequest);
             AWSXRay.endSubsegment();
 
             Subsegment processingSubsegment = AWSXRay.beginSubsegment("processingResults");
-            List<Map<String, AttributeValue>> items = queryResponse.items();
-            List<Map<String, Object>> comments = items.stream().map(item -> {
-                Map<String, Object> comment = new HashMap<>();
-                item.forEach((key, value) -> comment.put(key, value.s()));
-                return comment;
-            }).collect(Collectors.toList());
-
+            int totalPages = (int) Math.ceil((double) queryResponse.items().size() / pageSize);
+            int start = (page - 1) * pageSize;
+            int end = Math.min(start + pageSize, queryResponse.items().size());
+            List<Map<String, AttributeValue>> pagedItems = queryResponse.items().subList(start, end);
+            List<Map<String, String>> itemsString = ResponseTransformer.transformItems(pagedItems);
+            int totalComments = queryResponse.items().size();
+            Map<String, Integer> ratingCounts = new HashMap<>();
+            for (Map<String, AttributeValue> item : queryResponse.items()) {
+                String rating = item.get("Rating").n();
+                ratingCounts.put(rating, ratingCounts.getOrDefault(rating, 0) + 1);
+            }
             Map<String, Object> responseBody = new HashMap<>();
-            responseBody.put("comments", comments);
-            responseBody.put("totalComments", queryResponse.count());
-            responseBody.put("totalPages", (int) Math.ceil((double) queryResponse.count() / pageSize));
+            responseBody.put("comments", itemsString);
+            responseBody.put("totalPages", totalPages);
+            responseBody.put("totalComments", totalComments);
+            responseBody.put("ratingCounts", ratingCounts);
             AWSXRay.endSubsegment();
 
             Logger.getLogger(GetProductComments.class.getName()).info("Successfully obtained product comments");

@@ -1,8 +1,8 @@
 {
-  "CLIENT_APP_ID": "16fec44qrgoth26a20ob5ft0tb",
+  "CLIENT_APP_ID": "45n7fib8kur2pt2j3sjbkcc3jb",
   "DYNAMO_REGION": "us-east-1",
-  "USER_POOL_ID": "us-east-1_cl8iVMzUb",
-  "ISSUER": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_cl8iVMzUw",
+  "USER_POOL_ID": "us-east-1_7pGhc7VeN",
+  "ISSUER": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_7pGhc7VeN",
   "CART_TABLE": "CartDB",
   "ORDERS_TABLE": "OrdersDB",
   "PRODUCT_TABLE": "ProductCatalog",

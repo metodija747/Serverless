@@ -51,6 +51,12 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                         4,
                         30,
                         "Adding or changing product is unavailable."));
+        functionMap.put(Pattern.compile("POST:/dispatcher/authorization/login$"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-SignInFunction-F5kN2KStTeN5",
+                        3,
+                        4,
+                        30,
+                        "Unable to login at the moment. Please try again later."));
 
         // ... other mappings
     }

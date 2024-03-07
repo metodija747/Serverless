@@ -154,7 +154,7 @@ public class GetAndSearchProducts implements RequestHandler<Map<String, Object>,
             Subsegment pagingAndSegmentingSubsegment = AWSXRay.beginSubsegment("processingResults");
             // Calculate the total number of pages
             int totalPages = (int) Math.ceil((double) items.size() / pageSize);
-            // Get the items for the current page
+            // Get the  items for the current page
             int start = (page - 1) * pageSize;
             int end = Math.min(start + pageSize, items.size());
             List<Map<String, AttributeValue>> pagedItems = items.subList(start, end);

@@ -35,7 +35,7 @@ public class OpenApiGenerator {
 
             // Setting the base server URL
             Server server = new Server();
-            server.setUrl("https://xr51u2pzwg.execute-api.us-east-1.amazonaws.com/Stage/dispatcher");
+            server.setUrl("https://sjmdwpko0k.execute-api.us-east-1.amazonaws.com/Stage/dispatcher");
             openAPI.addServersItem(server);
 
             // Ensure components is initialized

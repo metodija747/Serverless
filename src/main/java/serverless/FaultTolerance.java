@@ -57,6 +57,12 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                         4,
                         30,
                         "Unable to login at the moment. Please try again later."));
+        functionMap.put(Pattern.compile("POST:/dispatcher/authorization/register$"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-RegisterUserFunction-7CoYuNbVJ6Yg",
+                        3,
+                        4,
+                        30,
+                        "Unable to register user at the moment. Please try again later."));
 
         // ... other mappings
     }

@@ -73,8 +73,14 @@ public class GetCart implements RequestHandler<Map<String, Object>, Map<String, 
         responseBody.put("products", pagedProducts);
         responseBody.put("totalPages", totalPages);
         responseBody.put("totalPrice", items.get(0).get("TotalPrice")); // Assuming 'TotalPrice' is a string
-        response.put("statusCode", 200);
 
-        return Collections.singletonMap("cart", responseBody);
+        response.put("statusCode", 200);
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        headers.put("Access-Control-Allow-Origin", "*"); // Allow all origins
+        response.put("headers", headers);
+        response.put("body", gson.toJson(responseBody));
+
+        return response;
     }
 }

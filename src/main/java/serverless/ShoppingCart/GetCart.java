@@ -68,10 +68,12 @@ public class GetCart implements RequestHandler<Map<String, Object>, Map<String, 
         int end = Math.min(start + PAGE_SIZE, products.size());
         List<Map<String, String>> pagedProducts = products.subList(start, end);
 
+        Map<String, Object> response = new HashMap<>();
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("products", pagedProducts);
         responseBody.put("totalPages", totalPages);
         responseBody.put("totalPrice", items.get(0).get("TotalPrice")); // Assuming 'TotalPrice' is a string
+        response.put("statusCode", 200);
 
         return Collections.singletonMap("cart", responseBody);
     }

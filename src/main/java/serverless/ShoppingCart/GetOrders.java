@@ -123,9 +123,10 @@ public class GetOrders implements RequestHandler<Map<String, Object>, Map<String
             }
             orders.forEach(order -> {
                 Instant timestamp = Instant.parse(order.get("TimeStamp"));
-                String formattedTimestamp = formatter.format(timestamp.atZone(ZoneId.systemDefault()).toLocalDate());
+                String formattedTimestamp = formatter.format(timestamp.atZone(ZoneId.systemDefault()));
                 order.put("TimeStamp", formattedTimestamp);
             });
+
             AWSXRay.endSubsegment();
 
             Map<String, Object> responseBody = new HashMap<>();

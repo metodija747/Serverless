@@ -136,7 +136,7 @@ Resources:
   GetCartFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ServerlessFunction
+      CodeUri:
       Handler: serverless.ShoppingCart.GetCart::handleRequest
       Runtime: java11
       MemorySize: 512

@@ -170,7 +170,7 @@ Resources:
             Path: /products
             Method: get
 
-  GetProductFunction:
+  ConcreteProductFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri:
@@ -204,7 +204,7 @@ Resources:
         GetCart:
           Type: Api
           Properties:
-            Path: /catalog/{productId}
+            Path: /products/{productId}
             Method: get
 
   GetCommentFunction:
@@ -243,6 +243,7 @@ Resources:
           Properties:
             Path: /comments/{productId}
             Method: get
+
   GetCartFunction:
     Type: AWS::Serverless::Function
     Properties:

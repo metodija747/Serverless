@@ -1,20 +1,20 @@
 package serverless.CatalogProduct;
 
-        import com.amazonaws.services.lambda.runtime.Context;
-        import com.amazonaws.services.lambda.runtime.RequestHandler;
-        import com.amazonaws.xray.AWSXRay;
-        import com.amazonaws.xray.entities.Subsegment;
-        import com.google.gson.Gson;
-        import serverless.lib.*;
-        import software.amazon.awssdk.regions.Region;
-        import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-        import software.amazon.awssdk.services.dynamodb.model.*;
-        import serverless.lib.LambdaDocumentationAnnotations.*;
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.xray.AWSXRay;
+import com.amazonaws.xray.entities.Subsegment;
+import com.google.gson.Gson;
+import serverless.lib.*;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.*;
+import serverless.lib.LambdaDocumentationAnnotations.*;
 
-        import java.util.HashMap;
-        import java.util.Map;
-        import java.util.logging.Level;
-        import java.util.logging.Logger;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ConcreteProduct implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 

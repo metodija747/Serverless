@@ -132,6 +132,43 @@ Resources:
           JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
       Layers:
         - !Ref SharedLibrariesLayer
+        -
+  SearchProductFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.CatalogProduct.SearchProduct::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Tracing: Active
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+      Layers:
+        - !Ref SharedLibrariesLayer
+      Events:
+        GetCart:
+          Type: Api
+          Properties:
+            Path: /products
+            Method: get
 
   GetCartFunction:
     Type: AWS::Serverless::Function

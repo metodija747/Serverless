@@ -17,10 +17,11 @@ import java.util.logging.Logger;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 import serverless.lib.LambdaDocumentationAnnotations.*;
-// yew
+
 public class DeleteUser implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     private static final Gson gson = new Gson();
+    private static final Logger logger = Logger.getLogger(DeleteUser.class.getName());
     private static ConfigManager configManager;
     private static CognitoIdentityProviderClient cognitoClient;
 
@@ -47,11 +48,11 @@ public class DeleteUser implements RequestHandler<Map<String, Object>, Map<Strin
             method = "DELETE"
     )
     @LambdaAPIResponses({
-            @LambdaAPIResponse(responseCode = 200, description = "User deleted successfully"),
-            @LambdaAPIResponse(responseCode = 400, description = "User does not exist"),
-            @LambdaAPIResponse(responseCode = 401, description = "Invalid token"),
-            @LambdaAPIResponse(responseCode = 403, description = "Not authorized to delete this user"),
-            @LambdaAPIResponse(responseCode = 500, description = "Failed to delete user")
+            @LambdaAPIResponse(responseCode = 200, description = "User deleted successfully."),
+            @LambdaAPIResponse(responseCode = 400, description = "User cannot be deleted because it is not present in the database."),
+            @LambdaAPIResponse(responseCode = 401, description = "Invalid token."),
+            @LambdaAPIResponse(responseCode = 403, description = "Not authorized to delete this user."),
+            @LambdaAPIResponse(responseCode = 500, description = "Failed to delete user due to an internal error.")
     })
     @LambdaSecurityRequirement(name = "BearerAuth")
     @Override
@@ -61,6 +62,9 @@ public class DeleteUser implements RequestHandler<Map<String, Object>, Map<Strin
 
     private Map<String, Object> deleteUser(Map<String, Object> event) {
         try {
+            // Log the entire event to understand the structure
+            logger.info("Received event: " + gson.toJson(event));
+
             Subsegment configSubsegment = AWSXRay.beginSubsegment("CollectConfigParams");
             String USER_POOL_ID = (String) configManager.get("USER_POOL_ID");
             String REGION = (String) configManager.get("DYNAMO_REGION");
@@ -74,15 +78,39 @@ public class DeleteUser implements RequestHandler<Map<String, Object>, Map<Strin
             try {
                 userId = TokenVerifier.verifyToken(idToken, ISSUER);
             } catch (Exception e) {
-                Logger.getLogger(DeleteUser.class.getName()).log(Level.SEVERE, "Failed to authenticate user", e);
+                logger.log(Level.SEVERE, "Failed to authenticate user", e);
                 return ResponseGenerator.generateResponse(401, "Invalid token.");
             }
-            String email = decodedJWT.getClaim("cognito:username").asString();
-            Logger.getLogger(DeleteUser.class.getName()).info("From cognito JWT the email is: " + email);
 
-            String pathEmail = (String) ((Map<String, Object>) event.get("pathParameters")).get("email");
-            Logger.getLogger(DeleteUser.class.getName()).info("From URL the email is: " + pathEmail);
-            pathEmail = URLDecoder.decode(pathEmail, "UTF-8");
+            // Correctly get the email claim from the token
+            String email = decodedJWT.getClaim("email").asString();
+
+            // Extract email from path parameters using proxy method
+            Subsegment extractParamsSubsegment = AWSXRay.beginSubsegment("ExtractingParameters");
+            Map<String, String> pathParameters = (Map<String, String>) event.get("pathParameters");
+            if (pathParameters == null || !pathParameters.containsKey("proxy")) {
+                logger.log(Level.SEVERE, "Proxy path parameters are missing or invalid");
+                return ResponseGenerator.generateResponse(400, "Missing or invalid path parameters.");
+            }
+
+            String proxyValue = pathParameters.get("proxy");
+            if (proxyValue == null || proxyValue.isEmpty()) {
+                logger.log(Level.SEVERE, "Proxy value is missing or empty");
+                return ResponseGenerator.generateResponse(400, "Proxy value is missing or empty.");
+            }
+
+            // Extracting email from proxy path
+            String[] parts = proxyValue.split("/");
+            String pathEmail = parts[parts.length - 1];
+            logger.info("Extracted email from URL: " + pathEmail);
+
+            try {
+                pathEmail = URLDecoder.decode(pathEmail, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                logger.log(Level.SEVERE, "Error decoding email parameter", e);
+                return ResponseGenerator.generateResponse(400, "Invalid email format.");
+            }
+
             if (!email.equals(pathEmail)) {
                 return ResponseGenerator.generateResponse(403, gson.toJson("Not authorized to delete this user."));
             }
@@ -97,22 +125,22 @@ public class DeleteUser implements RequestHandler<Map<String, Object>, Map<Strin
             cognitoClient.adminDeleteUser(deleteUserRequest);
             AWSXRay.endSubsegment();
 
-            Logger.getLogger(DeleteUser.class.getName()).info("User successfully deleted");
+            logger.info("User successfully deleted");
             return ResponseGenerator.generateResponse(200, gson.toJson("User deleted successfully"));
-        } catch (UnsupportedEncodingException e) {
-            Subsegment failureSubsegment = AWSXRay.beginSubsegment("DeletingUserFailed");
-            Logger.getLogger(DeleteUser.class.getName()).log(Level.SEVERE, "Failed to delete user", e);
-            AWSXRay.endSubsegment();
-            throw new RuntimeException("Deleting user failed due to UnsupportedEncodingException", e);
         } catch (CognitoIdentityProviderException e) {
             Subsegment failureSubsegment = AWSXRay.beginSubsegment("DeletingUserFailed");
-            Logger.getLogger(DeleteUser.class.getName()).log(Level.SEVERE, "Failed to delete user", e);
+            logger.log(Level.SEVERE, "Failed to delete user", e);
             AWSXRay.endSubsegment();
             if (e.statusCode() == 400 && e.getMessage().contains("User does not exist.")) {
-                return ResponseGenerator.generateResponse(400, gson.toJson("Failed to delete user because it does not exist."));
+                return ResponseGenerator.generateResponse(400, gson.toJson("User cannot be deleted because it is not present in the database."));
             } else {
                 throw new RuntimeException("Deleting user failed due to CognitoIdentityProviderException", e);
             }
+        } catch (Exception e) {
+            Subsegment failureSubsegment = AWSXRay.beginSubsegment("DeletingUserFailed");
+            logger.log(Level.SEVERE, "An unexpected error occurred while deleting the user", e);
+            AWSXRay.endSubsegment();
+            throw new RuntimeException("Failed to delete user", e);
         }
     }
 }

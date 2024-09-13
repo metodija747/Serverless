@@ -274,12 +274,93 @@ Resources:
           JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
       Layers:
         - !Ref SharedLibrariesLayer
-      Events:
-        GetCart:
-          Type: Api
-          Properties:
-            Path: /cart
-            Method: get
+
+  AddToCartFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.ShoppingCart.AddToCart::handleRequest
+      Runtime: java11
+      MemorySize: 1024
+      Timeout: 300
+      Tracing: Active
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Layers:
+        - !Ref SharedLibrariesLayer
+
+  DeleteFromCartFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.ShoppingCart.DeleteFromCart::handleRequest
+      Runtime: java11
+      MemorySize: 1024
+      Timeout: 300
+      Tracing: Active
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Layers:
+        - !Ref SharedLibrariesLayer
+        -
+  CheckoutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.ShoppingCart.Checkout::handleRequest
+      Runtime: java11
+      MemorySize: 1024
+      Timeout: 300
+      Tracing: Active
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Layers:
+        - !Ref SharedLibrariesLayer
 
   GetCommentsFunction:
     Type: AWS::Serverless::Function
@@ -310,6 +391,93 @@ Resources:
       Environment:
         Variables:
           JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+      Layers:
+        - !Ref SharedLibrariesLayer
+        -
+  DeleteCommentAndRatingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.CatalogProduct.DeleteCommentAndRating::handleRequest
+      Runtime: java11
+      MemorySize: 1024
+      Timeout: 300
+      Tracing: Active
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Layers:
+        - !Ref SharedLibrariesLayer
+
+  DeleteProductFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.CatalogProduct.DeleteProduct::handleRequest
+      Runtime: java11
+      MemorySize: 1024
+      Timeout: 300
+      Tracing: Active
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Layers:
+        - !Ref SharedLibrariesLayer
+
+  AddCommentAndRatingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.CatalogProduct.AddCommentAndRating::handleRequest
+      Runtime: java11
+      MemorySize: 1024
+      Timeout: 300
+      Tracing: Active
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
       Layers:
         - !Ref SharedLibrariesLayer
 
@@ -394,21 +562,112 @@ Resources:
             - Effect: Allow
               Action:
                 - ssm:GetParameter
-              Resource: "*"  # Be specific about resources in production
+              Resource: "*"
             - Effect: Allow
               Action:
                 - cloudwatch:PutMetricData
-              Resource: "*"  # Be specific about resources in production
+              Resource: "*"
             - Effect: Allow
               Action:
                 - xray:PutTraceSegments
                 - xray:PutTelemetryRecords
-              Resource: "*"  # Be specific about resources in production
+              Resource: "*"
       Environment:
         Variables:
           JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
       Layers:
         - !Ref SharedLibrariesLayer
+        -
+  ForgotPasswordFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.Authorization.ForgotPassword::handleRequest
+      Runtime: java11
+      MemorySize: 1024
+      Timeout: 900
+      Tracing: Active
+      Policies:
+        - AmazonCognitoPowerUser
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+      Layers:
+        - !Ref SharedLibrariesLayer
+
+  ConfirmForgotPasswordFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.Authorization.ConfirmForgotPassword::handleRequest
+      Runtime: java11
+      MemorySize: 1024
+      Timeout: 900
+      Tracing: Active
+      Policies:
+        - AmazonCognitoPowerUser
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+      Layers:
+        - !Ref SharedLibrariesLayer
+        -
+  DeleteUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+      Handler: serverless.Authorization.DeleteUser::handleRequest
+      Runtime: java11
+      MemorySize: 1024
+      Timeout: 300
+      Tracing: Active
+      Policies:
+        - AmazonCognitoPowerUser
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:PutMetricData
+                - xray:PutTraceSegments
+                - xray:PutTelemetryRecords
+              Resource: "*"
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+      Layers:
+        - !Ref SharedLibrariesLayer
+
 
   CircuitBreakerFunction:
     Type: AWS::Serverless::Function

@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// za r  ede ploy
 public class GetProduct implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     private static final Gson gson = new Gson();
@@ -61,10 +60,7 @@ public class GetProduct implements RequestHandler<Map<String, Object>, Map<Strin
             String PRODUCT_TABLE = (String) configManager.get("PRODUCT_TABLE");
             AWSXRay.endSubsegment();
 
-            Map<String, String> pathParameters = (Map<String, String>) event.get("pathParameters");
-            String proxyValue = pathParameters.get("proxy");
-            String[] parts = proxyValue.split("/");
-            String productId = parts[parts.length - 1];
+            String productId = ((Map<String, String>) event.get("pathParameters")).get("productId");
             Map<String, AttributeValue> key = new HashMap<>();
             key.put("productId", AttributeValue.builder().s(productId).build());
             GetItemRequest request = GetItemRequest.builder()
@@ -72,8 +68,13 @@ public class GetProduct implements RequestHandler<Map<String, Object>, Map<Strin
                     .tableName(PRODUCT_TABLE)
                     .build();
             GetItemResponse getItemResponse = dynamoDB.getItem(request);
-            Map<String, String> itemString = ResponseTransformer.transformItem(getItemResponse.item());
 
+            if (getItemResponse.item().isEmpty()) {
+                Logger.getLogger(GetProduct.class.getName()).info("Product not found");
+                return ResponseGenerator.generateResponse(404, gson.toJson("Product not found."));
+            }
+
+            Map<String, String> itemString = ResponseTransformer.transformItem(getItemResponse.item());
             Logger.getLogger(GetProduct.class.getName()).info("Successfully obtained product details");
             return ResponseGenerator.generateResponse(200, gson.toJson(itemString));
 

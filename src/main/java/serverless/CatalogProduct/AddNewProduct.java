@@ -54,7 +54,6 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
             initializeResources();
             return addNewProduct(event);
         } catch (Exception e) {
-            // Instead of a fallback, we directly return an error response
             Logger.getLogger(GetProduct.class.getName()).log(Level.SEVERE, "Error adding product", e);
             throw new RuntimeException("Error adding product", e);
             }

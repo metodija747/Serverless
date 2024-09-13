@@ -4,17 +4,14 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.xray.entities.Subsegment;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import serverless.lib.*;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
 import com.amazonaws.xray.AWSXRay;
-import java.net.MalformedURLException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -45,7 +42,6 @@ public class GetOrders implements RequestHandler<Map<String, Object>, Map<String
             @LambdaParameter(name = "pageSize", description = "Number of orders per page", in = LambdaDocumentationAnnotations.ParameterIn.QUERY, example = "10")
     })
     @LambdaSecurityRequirement(name = "BearerAuth")
-
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
         try {

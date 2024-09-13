@@ -332,7 +332,7 @@ Resources:
               Resource: "*"
       Layers:
         - !Ref SharedLibrariesLayer
-        -
+
   CheckoutFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -393,7 +393,7 @@ Resources:
           JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
       Layers:
         - !Ref SharedLibrariesLayer
-        -
+
   DeleteCommentAndRatingFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -513,7 +513,6 @@ Resources:
       Layers:
         - !Ref SharedLibrariesLayer
 
-
   RegisterUserFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -577,7 +576,7 @@ Resources:
           JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
       Layers:
         - !Ref SharedLibrariesLayer
-        -
+
   ForgotPasswordFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -638,7 +637,7 @@ Resources:
           JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
       Layers:
         - !Ref SharedLibrariesLayer
-        -
+
   DeleteUserFunction:
     Type: AWS::Serverless::Function
     Properties:

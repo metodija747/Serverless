@@ -110,7 +110,7 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
         String productId = body.containsKey("productId") && !((String) body.get("productId")).isEmpty() ? (String) body.get("productId") : UUID.randomUUID().toString();
         String description = (String) body.get("description");
         String beautifulComment = (String) body.get("beautifulComment");
-        int commentsCount = ((Number) body.get("commentsCount")).intValue();
+        int commentsCount = Integer.parseInt(String.valueOf(body.get("commentsCount"))); // Convert String or Number to int
         double discountPrice = Double.parseDouble(String.valueOf(body.get("discountPrice")));
         AWSXRay.endSubsegment();
 

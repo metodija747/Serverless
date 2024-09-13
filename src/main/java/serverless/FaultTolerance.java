@@ -51,6 +51,12 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                         4,
                         30,
                         "Adding or changing product is unavailable."));
+        functionMap.put(Pattern.compile("DELETE:/dispatcher/catalog$"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-DeleteProductFunction-XVTk18l5TcOu",
+                        3,
+                        4,
+                        30,
+                        "Failed to delete product."));
         functionMap.put(Pattern.compile("POST:/dispatcher/authorization/login$"),
                 new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-SignInFunction-F5kN2KStTeN5",
                         3,
@@ -75,6 +81,18 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                         4,
                         30,
                         "Unable to get product comments. Please try again"));
+        functionMap.put(Pattern.compile("POST:/dispatcher/comments$"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-AddCommentAndRatingFunction-kJU2feuXNRT3",
+                        3,
+                        4,
+                        30,
+                        "Failed to add comment and rating."));
+        functionMap.put(Pattern.compile("DELETE:/dispatcher/comments$"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-DeleteCommentAndRatingFunction-d3zMLNUaD4TS",
+                        3,
+                        4,
+                        30,
+                        "Failed to delete comment and rating."));
         functionMap.put(Pattern.compile("POST:/dispatcher/forgot-password$"),
                 new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-ForgotPasswordFunction-1hUlczVxCJlD",
                         3,

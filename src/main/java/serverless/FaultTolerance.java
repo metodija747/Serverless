@@ -75,13 +75,13 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                         4,
                         30,
                         "Unable to get product comments. Please try again"));
-        functionMap.put(Pattern.compile("POST:/dispatcher/authorization/forgot-password$"),
+        functionMap.put(Pattern.compile("POST:/dispatcher/forgot-password$"),
                 new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-ForgotPasswordFunction-1hUlczVxCJlD",
                         3,
                         4,
                         30,
                         "Failed to send confirmation code"));
-        functionMap.put(Pattern.compile("POST:/dispatcher/authorization/confirm-forgot-password$"),
+        functionMap.put(Pattern.compile("POST:/dispatcher/confirm-forgot-password$"),
                 new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-ConfirmForgotPasswordFunction-p50c9eFiA4rn",
                         3,
                         4,

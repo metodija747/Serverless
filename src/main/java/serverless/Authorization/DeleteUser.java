@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import java.net.URLDecoder;
 import java.io.UnsupportedEncodingException;
 import serverless.lib.LambdaDocumentationAnnotations.*;
-
+// yew
 public class DeleteUser implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     private static final Gson gson = new Gson();

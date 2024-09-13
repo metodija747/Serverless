@@ -78,7 +78,11 @@ public class DeleteUser implements RequestHandler<Map<String, Object>, Map<Strin
                 return ResponseGenerator.generateResponse(401, "Invalid token.");
             }
             String email = decodedJWT.getClaim("cognito:username").asString();
-            String pathEmail = URLDecoder.decode(((Map<String, String>) event.get("pathParameters")).get("email"), "UTF-8");
+            Logger.getLogger(DeleteUser.class.getName()).info("From cognito JWT the email is: " + email);
+
+            String pathEmail = (String) ((Map<String, Object>) event.get("pathParameters")).get("email");
+            Logger.getLogger(DeleteUser.class.getName()).info("From URL the email is: " + pathEmail);
+            pathEmail = URLDecoder.decode(pathEmail, "UTF-8");
             if (!email.equals(pathEmail)) {
                 return ResponseGenerator.generateResponse(403, gson.toJson("Not authorized to delete this user."));
             }

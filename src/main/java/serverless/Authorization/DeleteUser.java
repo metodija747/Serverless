@@ -43,7 +43,7 @@ public class DeleteUser implements RequestHandler<Map<String, Object>, Map<Strin
     @LambdaOperation(
             summary = "Delete a user",
             description = "Deletes a user from AWS Cognito user pool after verifying their identity.",
-            path = "/users/delete/{email}",
+            path = "/users/{email}",
             method = "DELETE"
     )
     @LambdaAPIResponses({

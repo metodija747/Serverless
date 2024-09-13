@@ -106,12 +106,12 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
         String productName = (String) body.get("productName");
         String categoryName = (String) body.get("categoryName");
         String imageURL = (String) body.get("imageURL");
-        double price = Double.parseDouble((String) body.get("price"));
+        double price = Double.parseDouble(String.valueOf(body.get("price")));
         String productId = body.containsKey("productId") && !((String) body.get("productId")).isEmpty() ? (String) body.get("productId") : UUID.randomUUID().toString();
         String description = (String) body.get("description");
         String beautifulComment = (String) body.get("beautifulComment");
         int commentsCount = ((Number) body.get("commentsCount")).intValue();
-        double discountPrice = Double.parseDouble((String) body.get("discountPrice"));
+        double discountPrice = Double.parseDouble(String.valueOf(body.get("discountPrice")));
         AWSXRay.endSubsegment();
 
 

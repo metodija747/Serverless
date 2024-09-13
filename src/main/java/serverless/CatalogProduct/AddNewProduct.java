@@ -105,13 +105,15 @@ public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<St
         String productName = (String) body.get("productName");
         String categoryName = (String) body.get("categoryName");
         String imageURL = (String) body.get("imageURL");
-        double price = ((Number) body.get("price")).doubleValue(); // Cast to Number, then get double value
+        Object priceObj = body.get("price");
+        double price = priceObj instanceof Number ? ((Number) priceObj).doubleValue() : Double.parseDouble((String) priceObj);
         String productId = body.containsKey("productId") && !((String) body.get("productId")).isEmpty() ? (String) body.get("productId") : UUID.randomUUID().toString();
         String description = (String) body.get("description");
         String beautifulComment = (String) body.get("beautifulComment");
-        int commentsCount = ((Number) body.get("commentsCount")).intValue(); // Cast to Number, then get int value
-        double discountPrice = ((Number) body.get("discountPrice")).doubleValue(); // Cast to Number, then get double value
-        AWSXRay.endSubsegment();
+        Object commentsCountObj = body.get("commentsCount");
+        int commentsCount = commentsCountObj instanceof Number ? ((Number) commentsCountObj).intValue() : Integer.parseInt((String) commentsCountObj);
+        Object discountPriceObj = body.get("discountPrice");
+        double discountPrice = discountPriceObj instanceof Number ? ((Number) discountPriceObj).doubleValue() : Double.parseDouble((String) discountPriceObj);        AWSXRay.endSubsegment();
 
 
         Subsegment addNewProductSubSegment = AWSXRay.beginSubsegment("addNewProduct");

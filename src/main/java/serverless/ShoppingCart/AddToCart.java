@@ -173,10 +173,10 @@ public class AddToCart implements RequestHandler<Map<String, Object>, Map<String
                 GetItemRequest getProductRequest = GetItemRequest.builder()
                         .tableName(PRODUCT_TABLE)
                         .key(productKey)
-                        .attributesToGet("Price")
+                        .attributesToGet("discountPrice")
                         .build();
                 GetItemResponse getProductResponse = dynamoDB.getItem(getProductRequest);
-                double productPrice = Double.parseDouble(getProductResponse.item().get("Price").n());
+                double productPrice = Double.parseDouble(getProductResponse.item().get("discountPrice").n());
                 totalPrice += productPrice * quantityOrder;
             }
 

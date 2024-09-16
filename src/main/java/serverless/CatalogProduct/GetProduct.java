@@ -60,7 +60,10 @@ public class GetProduct implements RequestHandler<Map<String, Object>, Map<Strin
             String PRODUCT_TABLE = (String) configManager.get("PRODUCT_TABLE");
             AWSXRay.endSubsegment();
 
-            String productId = ((Map<String, String>) event.get("pathParameters")).get("productId");
+            Map<String, String> pathParameters = (Map<String, String>) event.get("pathParameters");
+            String proxyValue = pathParameters.get("proxy");
+            String[] parts = proxyValue.split("/");
+            String productId = parts[parts.length - 1];
             Map<String, AttributeValue> key = new HashMap<>();
             key.put("productId", AttributeValue.builder().s(productId).build());
             GetItemRequest request = GetItemRequest.builder()

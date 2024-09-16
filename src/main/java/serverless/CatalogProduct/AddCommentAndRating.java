@@ -44,7 +44,7 @@ public class AddCommentAndRating implements RequestHandler<Map<String, Object>, 
     @LambdaOperation(
             summary = "Add Comment and Rating",
             description = "Allows users to add a comment and rating for a specific product.",
-            path = "/comment/{productId}",
+            path = "/comments/{productId}",
             method = "POST"
     )
     @LambdaRequestBody(

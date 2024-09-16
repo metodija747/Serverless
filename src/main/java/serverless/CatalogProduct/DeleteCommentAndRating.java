@@ -45,7 +45,7 @@ public class DeleteCommentAndRating implements RequestHandler<Map<String, Object
     @LambdaOperation(
             summary = "Delete Comment and Rating",
             description = "Allows users to delete a comment and rating for a specific product.",
-            path = "/comment/{productId}",
+            path = "/comments/{productId}",
             method = "DELETE"
     )
     @LambdaAPIResponses({
@@ -82,7 +82,9 @@ public class DeleteCommentAndRating implements RequestHandler<Map<String, Object
 
             // Extract productId from path parameters
             Map<String, String> pathParameters = (Map<String, String>) event.get("pathParameters");
-            String productId = pathParameters.get("productId");
+            String proxyValue = pathParameters.get("proxy");
+            String[] parts = proxyValue.split("/");
+            String productId = parts[parts.length - 1];
 
             // Retrieve the rating of the comment before deletion
             Subsegment retrieveRatingSubsegment = AWSXRay.beginSubsegment("retrieveRating");

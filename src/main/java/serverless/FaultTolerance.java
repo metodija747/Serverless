@@ -121,14 +121,8 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                         4,
                         30,
                         "Failed to obtain user's cart."));
-        functionMap.put(Pattern.compile("GET:/dispatcher/cart$"),
-                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-GetCartFunction-2xx2vqoXrqlR",
-                        3,
-                        4,
-                        30,
-                        "Failed to obtain user's cart."));
         functionMap.put(Pattern.compile("POST:/dispatcher/cart$"),
-                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-GetCartFunction-2xx2vqoXrqlR",
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-AddToCartFunction-3VPTyM9gqM1l",
                         3,
                         4,
                         30,

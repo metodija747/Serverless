@@ -99,7 +99,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                         4,
                         30,
                         "Failed to add comment and rating."));
-        functionMap.put(Pattern.compile("DELETE:/dispatcher/comments$"),
+        functionMap.put(Pattern.compile("DELETE:/dispatcher/comments/.+"),
                 new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-DeleteCommentAndRatingFunction-d3zMLNUaD4TS",
                         3,
                         4,

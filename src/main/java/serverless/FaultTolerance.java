@@ -25,8 +25,6 @@ import java.util.regex.Pattern;
 
 public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
-//    LambdaClient lambdaClient = LambdaClient.builder().build();
-//    DynamoDbClient dynamoDB = DynamoDbClient.builder().build();
     private static LambdaClient lambdaClient;
     private static DynamoDbClient dynamoDB;
     private static final String DYNAMODB_TABLE = "ErrorTracker";
@@ -117,13 +115,44 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                         4,
                         30,
                         "Failed to delete user"));
-
-
-
-        // ... other mappings
+        functionMap.put(Pattern.compile("GET:/dispatcher/cart$"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-GetCartFunction-2xx2vqoXrqlR",
+                        3,
+                        4,
+                        30,
+                        "Failed to obtain user's cart."));
+        functionMap.put(Pattern.compile("GET:/dispatcher/cart$"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-GetCartFunction-2xx2vqoXrqlR",
+                        3,
+                        4,
+                        30,
+                        "Failed to obtain user's cart."));
+        functionMap.put(Pattern.compile("POST:/dispatcher/cart$"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-GetCartFunction-2xx2vqoXrqlR",
+                        3,
+                        4,
+                        30,
+                        "Failed to add to cart."));
+        functionMap.put(Pattern.compile("DELETE:/dispatcher/cart/.+"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-DeleteFromCartFunction-0nzCqACo8kGk",
+                        3,
+                        4,
+                        30,
+                        "Failed to delete from cart."));
+        functionMap.put(Pattern.compile("POST:/dispatcher/checkout$"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-CheckoutFunction-LFNX85HS3Npa",
+                        3,
+                        4,
+                        30,
+                        "Failed to process checkout."));
+        functionMap.put(Pattern.compile("GET:/dispatcher/orders/.+"),
+                new FunctionInfo("arn:aws:lambda:us-east-1:183636859032:function:advancedMetodija747-GetOrdersFunction-NWRWJoCOC2mr",
+                        3,
+                        4,
+                        30,
+                        "Unable to fetch orders. Please try again later."));
     }
 
-    // Static initialization block remains unchanged
 
     private static LambdaClient getLambdaClient() {
         if (lambdaClient == null) {
@@ -186,7 +215,6 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
                 InvokeResponse invokeResponse = lambdaClientInstance.invoke(invokeRequest);
                 String responseJson = invokeResponse.payload().asUtf8String();
 
-                // Check if the Lambda function has thrown an error
                 if (invokeResponse.functionError() != null) {
                     System.err.println("" + invokeResponse + " " + invokeResponse.functionError());
 
@@ -241,7 +269,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
             }
         }
         metricsHandler.incrementFallbackCalls();
-        return fallbackResponse(functionInfo.getFallbackMessage());  // retries exhausted or circuit is open, return fallback response
+        return fallbackResponse(functionInfo.getFallbackMessage());
     }
 
     private String getFunctionNameFromARN(String arn) {
@@ -269,7 +297,7 @@ public class FaultTolerance implements RequestHandler<Map<String, Object>, Map<S
 
     private void logError(String serviceName, long CircuitResetTimeout, Exception e) {
         long now = System.currentTimeMillis();
-        long resetTime = now / 1000 + CircuitResetTimeout;  // Reset the circuit after 30 seconds
+        long resetTime = now / 1000 + CircuitResetTimeout;
 
         Map<String, AttributeValue> item = new HashMap<>();
         item.put("PK", AttributeValue.builder().s(serviceName).build());

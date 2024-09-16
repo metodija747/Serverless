@@ -87,7 +87,9 @@ public class DeleteFromCart implements RequestHandler<Map<String, Object>, Map<S
             // Obtain Product ID for Deletion
             Subsegment obtainProductIDSubsegment = AWSXRay.beginSubsegment("ObtainingProductID");
             Map<String, String> pathParameters = (Map<String, String>) event.get("pathParameters");
-            String productIdToDelete = pathParameters.get("productId");
+            String proxyValue = pathParameters.get("proxy");
+            String[] partsing = proxyValue.split("/");
+            String productIdToDelete = partsing[partsing.length - 1];
             obtainProductIDSubsegment.putMetadata("productIdToDelete", productIdToDelete);
             AWSXRay.endSubsegment();
 

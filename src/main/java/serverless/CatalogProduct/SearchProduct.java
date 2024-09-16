@@ -44,7 +44,7 @@ public class SearchProduct implements RequestHandler<Map<String, Object>, Map<St
         try {
             initializeResources();
             String REGION = (String) configManager.get("DYNAMO_REGION");
-            String PRODUCT_TABLE = (String) configManager.get("PRODUCT_TABLE");
+            String PRODUCT_TABLE = "ProductCatalog1";
 
             Subsegment extractingQueryParameters = AWSXRay.beginSubsegment("extractingQueryParameters");
             Map<String, Object> queryStringParameters = new HashMap<>();

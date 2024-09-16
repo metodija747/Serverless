@@ -42,7 +42,7 @@ public class ConcreteProduct implements RequestHandler<Map<String, Object>, Map<
     public Map<String, Object> getProduct(Map<String, Object> event) {
         try {
             Subsegment configSubsegment = AWSXRay.beginSubsegment("collectConfigParams");
-            String PRODUCT_TABLE = (String) configManager.get("PRODUCT_TABLE");
+            String PRODUCT_TABLE = "ProductCatalog1";
             AWSXRay.endSubsegment();
 
             Map<String, String> pathParameters = (Map<String, String>) event.get("pathParameters");

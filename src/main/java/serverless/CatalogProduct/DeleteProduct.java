@@ -42,7 +42,7 @@ public class DeleteProduct implements RequestHandler<Map<String, Object>, Map<St
     @LambdaOperation(
             summary = "Delete Product",
             description = "Allows admin users to delete a specific product from the catalog.",
-            path = "/product/{productId}",
+            path = "/catalog/{productId}",
             method = "DELETE"
     )
     @LambdaAPIResponses({

@@ -82,7 +82,9 @@ public class DeleteProduct implements RequestHandler<Map<String, Object>, Map<St
 
             Subsegment deleteProductSubsegment = AWSXRay.beginSubsegment("deleteProduct");
             Map<String, String> pathParameters = (Map<String, String>) event.get("pathParameters");
-            String productId = pathParameters.get("productId");
+            String proxyValue = pathParameters.get("proxy");
+            String[] parts = proxyValue.split("/");
+            String productId = parts[parts.length - 1];
             deleteProductSubsegment.putMetadata("productId", productId);
 
             // Check if the product exists in the database

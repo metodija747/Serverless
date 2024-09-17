@@ -4,15 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.models.OpenAPI;
-import serverless.Authorization.RegisterUser;
-import serverless.Authorization.SignIn;
-import serverless.CatalogProduct.AddNewProduct;
-import serverless.CatalogProduct.GetAndSearchProducts;
+import serverless.Authorization.*;
+import serverless.CatalogProduct.*;
+import serverless.ShoppingCart.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import serverless.CatalogProduct.GetProduct;
-import serverless.CatalogProduct.GetProductComments;
-import serverless.ShoppingCart.GetOrders;
 
 public class OpenApiDocumentationGenerator {
 
@@ -27,12 +23,24 @@ public class OpenApiDocumentationGenerator {
         OpenApiGenerator generator = new OpenApiGenerator(aggregatedOpenAPI);
 //        insert here all classes for which we added open api specification
         Class<?>[] lambdaClasses = {
-                GetAndSearchProducts.class,
-                GetProduct.class,
-                AddNewProduct.class,
+                ConfirmForgotPassword.class,
+                DeleteUser.class,
+                ForgotPassword.class,
                 SignIn.class,
                 RegisterUser.class,
+
+                AddCommentAndRating.class,
+                AddNewProduct.class,
+                DeleteCommentAndRating.class,
+                DeleteProduct.class,
+                GetAndSearchProducts.class,
+                GetProduct.class,
                 GetProductComments.class,
+
+                AddToCart.class,
+                Checkout.class,
+                DeleteFromCart.class,
+                GetCart.class,
                 GetOrders.class
         };
         for (Class<?> lambdaClass : lambdaClasses) {

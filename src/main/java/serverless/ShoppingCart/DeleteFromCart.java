@@ -140,7 +140,7 @@ public class DeleteFromCart implements RequestHandler<Map<String, Object>, Map<S
                 logger.info("Product with given productId does not exist in the database.");
                 return ResponseGenerator.generateResponse(404, gson.toJson("Product cannot be deleted because it is not present in the database."));
             }
-            double productPrice = Double.parseDouble(getProductResponse.item().get("Price").n());
+            double productPrice = Double.parseDouble(getProductResponse.item().get("discountPrice").n());
 
             // Update the total price
             double updatedTotalPrice = totalPrice - productPrice * quantityToDelete;

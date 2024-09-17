@@ -48,7 +48,7 @@ public class DeleteFromCart implements RequestHandler<Map<String, Object>, Map<S
             method = "DELETE"
     )
     @LambdaParameters({
-            @LambdaParameter(name = "productId", description = "Unique identifier for the product to be deleted from the cart", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "a9abe32e-9bd6-43aa-bc00-9044a27b858b")
+            @LambdaParameter(name = "productId", description = "Unique identifier for the product to be deleted from the cart", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "69c52025-fcd6-4fc3-a3c0-5a2a915607c4")
     })
     @LambdaSecurityRequirement(name = "BearerAuth")
     @LambdaAPIResponses({

@@ -29,7 +29,7 @@ public class GetProduct implements RequestHandler<Map<String, Object>, Map<Strin
             method = "GET"
     )
     @LambdaParameters({
-            @LambdaParameter(name = "productId", description = "Unique identifier for the product", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "a9abe32e-9bd6-43aa-bc00-9044a27b858b")
+            @LambdaParameter(name = "productId", description = "Unique identifier for the product", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "69c52025-fcd6-4fc3-a3c0-5a2a915607c4")
     })
     @LambdaAPIResponses({
             @LambdaAPIResponse(responseCode = 200, description = "Successfully obtained product details."),

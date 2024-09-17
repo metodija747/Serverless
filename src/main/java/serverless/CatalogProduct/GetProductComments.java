@@ -47,14 +47,13 @@ public class GetProductComments implements RequestHandler<Map<String, Object>, M
             method = "GET"
     )
     @LambdaParameters({
-            @LambdaParameter(name = "productId", description = "ID of the product to get comments for", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "a9abe32e-9bd6-43aa-bc00-9044a27b858b"),
+            @LambdaParameter(name = "productId", description = "ID of the product to get comments for", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "69c52025-fcd6-4fc3-a3c0-5a2a915607c4"),
             @LambdaParameter(name = "page", description = "Page number for pagination", in = LambdaDocumentationAnnotations.ParameterIn.QUERY, example = "1"),
             @LambdaParameter(name = "pageSize", description = "Number of comments per page", in = LambdaDocumentationAnnotations.ParameterIn.QUERY, example = "4")
     })
 
     @LambdaAPIResponses({
             @LambdaAPIResponse(responseCode = 200, description = "Successfully obtained product comments."),
-            @LambdaAPIResponse(responseCode = 404, description = "Product not found."),
             @LambdaAPIResponse(responseCode = 500, description = "Unable to get product comments. Please try again")
     })
     @Override

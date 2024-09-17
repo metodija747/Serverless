@@ -54,7 +54,7 @@ public class AddToCart implements RequestHandler<Map<String, Object>, Map<String
             content = @LambdaContent(
                     mediaType = "application/json",
                     schema = @LambdaSchema(
-                            example = "{ \"productId\": \"a9abe32e-9bd6-43aa-bc00-9044a27b858b\", \"quantity\": \"2\" }"
+                            example = "{ \"productId\": \"69c52025-fcd6-4fc3-a3c0-5a2a915607c4\", \"quantity\": \"2\" }"
                     )
             )
     )

@@ -41,7 +41,7 @@ public class DeleteProduct implements RequestHandler<Map<String, Object>, Map<St
 
     @LambdaOperation(
             summary = "Delete Product",
-            description = "Allows admin users to delete a specific product from the catalog.",
+            description = "Allows admin users to delete a specific product from the catalog. IT WORKS, BUT DO NOT USE IT!",
             path = "/catalog/{productId}",
             method = "DELETE"
     )
@@ -53,7 +53,7 @@ public class DeleteProduct implements RequestHandler<Map<String, Object>, Map<St
             @LambdaAPIResponse(responseCode = 500, description = "Failed to delete product.")
     })
     @LambdaParameters({
-            @LambdaParameter(name = "productId", description = "productID of the product to be deleted.", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "a9abe32e-9bd6-43aa-bc00-9044a27b858b")
+            @LambdaParameter(name = "productId", description = "productID of the product to be deleted.", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "69c52025-fcd6-4fc3-a3c0-5a2a915607c4")
     })
     @LambdaSecurityRequirement(name = "BearerAuth")
     @Override

@@ -49,7 +49,7 @@ public class DeleteCommentAndRating implements RequestHandler<Map<String, Object
             method = "DELETE"
     )
     @LambdaParameters({
-            @LambdaParameter(name = "productId", description = "productID of the product for which comment is deleted.", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "a9abe32e-9bd6-43aa-bc00-9044a27b858b")
+            @LambdaParameter(name = "productId", description = "productID of the product for which comment is deleted.", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "69c52025-fcd6-4fc3-a3c0-5a2a915607c4")
     })
     @LambdaAPIResponses({
             @LambdaAPIResponse(responseCode = 200, description = "Comment and rating deleted successfully."),

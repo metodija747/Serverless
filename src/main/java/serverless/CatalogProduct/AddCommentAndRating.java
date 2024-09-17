@@ -52,12 +52,12 @@ public class AddCommentAndRating implements RequestHandler<Map<String, Object>, 
             content = @LambdaContent(
                     mediaType = "application/json",
                     schema = @LambdaSchema(
-                            example = "{ \"productId\": \"a9abe32e-9bd6-43aa-bc00-9044a27b858b\", \"comment\": \"Love this product! Highly recommend.\", \"rating\": 5 }"
+                            example = "{ \"productId\": \"69c52025-fcd6-4fc3-a3c0-5a2a915607c4\", \"comment\": \"Love this product! Highly recommend.\", \"rating\": \"5\" }"
                     )
             )
     )
     @LambdaParameters({
-            @LambdaParameter(name = "productId", description = "productID of the product for which comment is inserted.", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "a9abe32e-9bd6-43aa-bc00-9044a27b858b")
+            @LambdaParameter(name = "productId", description = "productID of the product for which comment is inserted.", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "69c52025-fcd6-4fc3-a3c0-5a2a915607c4")
     })
     @LambdaAPIResponses({
             @LambdaAPIResponse(responseCode = 200, description = "Comment and rating added successfully."),

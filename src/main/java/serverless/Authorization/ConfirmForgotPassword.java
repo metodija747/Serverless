@@ -40,7 +40,7 @@ public class ConfirmForgotPassword implements RequestHandler<Map<String, Object>
     @LambdaOperation(
             summary = "Process confirm forgot password request",
             description = "Validates confirmation code and sets new password for the user.",
-            path = "/authorization/confirm-forgot-password",
+            path = "/confirm-forgot-password",
             method = "POST"
     )
     @LambdaRequestBody(

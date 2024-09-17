@@ -41,7 +41,7 @@ public class ForgotPassword implements RequestHandler<Map<String, Object>, Map<S
     @LambdaOperation(
             summary = "Process forgot password request",
             description = "Initiates a password reset process and sends a confirmation code to the user's registered email.",
-            path = "/authorization/forgot-password",
+            path = "/forgot-password",
             method = "POST"
     )
     @LambdaRequestBody(

@@ -52,6 +52,9 @@ public class DeleteProduct implements RequestHandler<Map<String, Object>, Map<St
             @LambdaAPIResponse(responseCode = 404, description = "Product cannot be deleted because it is not present in the database."),
             @LambdaAPIResponse(responseCode = 500, description = "Failed to delete product.")
     })
+    @LambdaParameters({
+            @LambdaParameter(name = "productId", description = "productID of the product to be deleted.", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "a9abe32e-9bd6-43aa-bc00-9044a27b858b")
+    })
     @LambdaSecurityRequirement(name = "BearerAuth")
     @Override
     public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {

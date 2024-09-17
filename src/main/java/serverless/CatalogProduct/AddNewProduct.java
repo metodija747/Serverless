@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import serverless.lib.LambdaDocumentationAnnotations.*;
-
+// is it
 public class AddNewProduct implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     private static final Gson gson = new Gson();

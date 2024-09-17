@@ -73,7 +73,11 @@ public class DeleteFromCart implements RequestHandler<Map<String, Object>, Map<S
 
             // Authentication
             Subsegment authenticationSubsegment = AWSXRay.beginSubsegment("authenticatingUser");
-            String token = ((Map<String, String>) event.get("headers")).get("Authorization");
+            String authHeader = ((Map<String, String>) event.get("headers")).get("Authorization");
+            String token = "";
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring("Bearer ".length());
+            }
             String userId;
             try {
                 userId = TokenVerifier.verifyToken(token, ISSUER);

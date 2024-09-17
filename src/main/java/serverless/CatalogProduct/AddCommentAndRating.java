@@ -72,7 +72,11 @@ public class AddCommentAndRating implements RequestHandler<Map<String, Object>, 
             AWSXRay.endSubsegment();
 
             Subsegment tokenVerificationSubsegment = AWSXRay.beginSubsegment("AuthenticatingUser");
-            String token = ((Map<String, String>) event.get("headers")).get("Authorization");
+            String authHeader = ((Map<String, String>) event.get("headers")).get("Authorization");
+            String token = "";
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring("Bearer ".length());
+            }
             String userId = TokenVerifier.verifyToken(token, ISSUER);
             AWSXRay.endSubsegment();
 

@@ -66,7 +66,11 @@ public class DeleteProduct implements RequestHandler<Map<String, Object>, Map<St
                     .build();
 
             Subsegment tokenVerificationSubsegment = AWSXRay.beginSubsegment("authenticatingUser");
-            String token = ((Map<String, String>) event.get("headers")).get("Authorization");
+            String authHeader = ((Map<String, String>) event.get("headers")).get("Authorization");
+            String token = "";
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring("Bearer ".length());
+            }
             List<String> groups;
             try {
                 groups = TokenVerifier.getGroups(token, ISSUER);

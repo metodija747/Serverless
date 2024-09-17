@@ -72,7 +72,11 @@ public class DeleteUser implements RequestHandler<Map<String, Object>, Map<Strin
             AWSXRay.endSubsegment();
 
             Subsegment authenticationSubsegment = AWSXRay.beginSubsegment("AuthenticatingUser");
-            String idToken = ((Map<String, String>) event.get("headers")).get("Authorization");
+            String authHeader = ((Map<String, String>) event.get("headers")).get("Authorization");
+            String idToken = "";
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                idToken = authHeader.substring("Bearer ".length());
+            }
             DecodedJWT decodedJWT = JWT.decode(idToken);
             String userId;
             try {

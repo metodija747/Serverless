@@ -47,6 +47,9 @@ public class DeleteUser implements RequestHandler<Map<String, Object>, Map<Strin
             path = "/users/{email}",
             method = "DELETE"
     )
+    @LambdaParameters({
+            @LambdaParameter(name = "email", description = "Email address of the user to be deleted", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "john.doe@example.com")
+    })
     @LambdaAPIResponses({
             @LambdaAPIResponse(responseCode = 200, description = "User deleted successfully."),
             @LambdaAPIResponse(responseCode = 400, description = "User cannot be deleted because it is not present in the database."),

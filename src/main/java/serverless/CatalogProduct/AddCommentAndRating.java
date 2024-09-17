@@ -56,6 +56,9 @@ public class AddCommentAndRating implements RequestHandler<Map<String, Object>, 
                     )
             )
     )
+    @LambdaParameters({
+            @LambdaParameter(name = "productId", description = "productID of the product for which comment is inserted.", in = LambdaDocumentationAnnotations.ParameterIn.PATH, example = "a9abe32e-9bd6-43aa-bc00-9044a27b858b")
+    })
     @LambdaAPIResponses({
             @LambdaAPIResponse(responseCode = 200, description = "Comment and rating added successfully."),
             @LambdaAPIResponse(responseCode = 401, description = "Invalid token."),

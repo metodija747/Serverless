@@ -146,7 +146,10 @@ public class AddCommentAndRating implements RequestHandler<Map<String, Object>, 
                     .value(AttributeValue.builder().n(String.valueOf(avgRating)).build())
                     .action(AttributeAction.PUT)
                     .build());
-
+            attributeUpdates.put("commentsCount", AttributeValueUpdate.builder()
+                    .value(AttributeValue.builder().n("1").build())
+                    .action(AttributeAction.ADD)
+                    .build());
             UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
                     .tableName(PRODUCT_TABLE)
                     .key(key)
